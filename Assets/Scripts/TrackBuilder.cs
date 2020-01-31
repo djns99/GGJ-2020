@@ -154,10 +154,11 @@ public class TrackBuilder : MonoBehaviour
         if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
         {
             updateLine(++lineIndex);
-        }
 
-        if (lineIndex % noiseUpdateLength == 0 && numNoises < noiseWeights.Length) {
-            incrementNoise();
+            if (lineIndex % noiseUpdateLength == 0 && numNoises < noiseWeights.Length)
+            {
+                incrementNoise();
+            }
         }
     }
 }
