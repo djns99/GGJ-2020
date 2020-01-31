@@ -2130,6 +2130,7 @@ MonoBehaviour:
   trackElement: {fileID: 6897298473756233714, guid: ff33040a2f5bf45499f4c942684e84bb,
     type: 3}
   frameBetweenUpdates: 2
+  numNoises: 1
 --- !u!1 &2058509255
 GameObject:
   m_ObjectHideFlags: 0
