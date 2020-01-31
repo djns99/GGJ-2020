@@ -104,7 +104,6 @@ public class TrackBuilder : MonoBehaviour
         if (linePositions2.Count > 0)
         {
             linePositions2.RemoveRange(linePositions2.Count - 2, 2);
-            linePositions3.RemoveRange(linePositions3.Count - 2, 2);
         }
 
         for (int i = 0; i < numSegmentsInViewport; i++)
@@ -117,9 +116,9 @@ public class TrackBuilder : MonoBehaviour
         Vector3 first = linePositions3[0];
         Vector3 last = linePositions3[linePositions3.Count - 1];
         last.y = -cam.orthographicSize * 4;
-        addPointToLinePos(last);
+        linePositions2.Add(last);
         first.y = -cam.orthographicSize * 4;
-        addPointToLinePos(first);
+        linePositions2.Add(first);
 
         var collider = line.GetComponent<PolygonCollider2D>();
         collider.SetPath(0, linePositions2.ToArray());
@@ -131,7 +130,7 @@ public class TrackBuilder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 3]).x < 1.1f)
+        if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
         {
             updateLine(++lineIndex);
         }
