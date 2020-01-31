@@ -86,6 +86,7 @@ public class TrackBuilder : MonoBehaviour
 
     void updateLine(long id)
     {
+        int width = (int)(cam.orthographicSize * cam.aspect * 2);
         bool removePrevious = id >= 3;
         id *= numSegmentsInViewport;
         int numToRemove = 0;
@@ -98,7 +99,7 @@ public class TrackBuilder : MonoBehaviour
         linePositions3.RemoveRange(0, numToRemove);
         for (int i = 0; i < numSegmentsInViewport; i++)
         {
-            var next = new Vector3(id * segmentWidth, getNoise(id), 0.0f);
+            var next = new Vector3(id * segmentWidth - width, getNoise(id), 0.0f);
             linePositions2.Add(next);
             linePositions3.Add(next);
             id++;
@@ -127,6 +128,6 @@ public class TrackBuilder : MonoBehaviour
             incrementNoise();
         }
 
-        cam.transform.position += new Vector3(Time.fixedDeltaTime * 100,0f, 0f);
+        //cam.transform.position += new Vector3(Time.fixedDeltaTime * 100,0f, 0f);
     }
 }
