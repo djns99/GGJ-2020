@@ -92,8 +92,6 @@ public class TrackBuilder : MonoBehaviour
         for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < 0.1f; numToRemove++)
             ;
 
-        Debug.Log("Remove: " + numToRemove.ToString());
-        Debug.Log("Pos id: " + id.ToString());
         linePositions2.RemoveRange(0, numToRemove);
         linePositions3.RemoveRange(0, numToRemove);
         for (int i = 0; i < numSegmentsInViewport; i++)
@@ -104,19 +102,13 @@ public class TrackBuilder : MonoBehaviour
             id++;
         }
 
-        Debug.Log(linePositions3.Count);
-
-        foreach(var pos in linePositions3.ToArray()) {
-            Debug.Log(pos);
-        }
-
         line.GetComponent<EdgeCollider2D>().points = linePositions2.ToArray();
         line.GetComponent<LineRenderer>().positionCount = linePositions3.Count;
         line.GetComponent<LineRenderer>().SetPositions(linePositions3.ToArray());
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
         {
@@ -127,6 +119,6 @@ public class TrackBuilder : MonoBehaviour
             incrementNoise();
         }
 
-        cam.transform.position += new Vector3(Time.fixedDeltaTime * 100,0f, 0f);
+        cam.transform.position += new Vector3(Time.deltaTime * 100,0f, 0f);
     }
 }
