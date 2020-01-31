@@ -5,17 +5,20 @@ using UnityEngine;
 public class TrackBuilder : MonoBehaviour
 {
     public GameObject trackElement;
+    private GameObject line;
+    private List<Vector2> linePositions2 = new List<Vector2>();
+    private List<Vector3> linePositions3 = new List<Vector3>();
+    public int segmentWidth = 10;
+    private int numSegmentsInViewport;
 
-    Queue<GameObject> track = new Queue<GameObject>();
-    Vector3 last = new Vector3();
-    long updates = 1;
-    public long frameBetweenUpdates = 1;
-    long framesSinceUpdate = 0;
+    long lineIndex = 1;
+
     public int numNoises = 1;
     float[] noiseWeights = { 1.0f, 0.1f, 0.5f };
     float[] noiseMultipliers = { 0.01f, 0.1f, 0.05f };
     float maxNoise = 0;
-    long noiseUpdateLength = 1000;
+    long noiseUpdateLength = 10;
+
 
     int noiseFadeInLength = 10;
     int noiseFadeIn = -1;
@@ -66,56 +69,64 @@ public class TrackBuilder : MonoBehaviour
     void Start()
     {
         cam = Camera.main;
+        line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
+        int width = (int)(cam.orthographicSize * cam.aspect * 2);
+        numSegmentsInViewport = (int)(width / segmentWidth);
 
         maxNoise = 0.0f;
         for (int i = 0; i < numNoises; i++) {
             maxNoise += noiseWeights[i];
         }
 
-        var cube = Instantiate(trackElement, new Vector3(), Quaternion.identity);
-        var camHeight = cam.orthographicSize * 0.9f;
-        last = new Vector3(0.0f, getNoise(0), 0.0f);
-        addCube(++updates);
+        updateLine(0);
+        updateLine(1);
+        updateLine(2);
+        lineIndex = 2;
     }
 
-    GameObject addCube(long id) {
-        var cube = Instantiate(trackElement, new Vector3(), Quaternion.identity);
-        var next = new Vector3(updates * trackElement.GetComponent<BoxCollider2D>().size.x, getNoise(id), 0.0f);
-        var between = next - last;
-        var distance = between.magnitude;
-        Vector3 copy = cube.transform.localScale;
-        copy.z = distance;
-        cube.transform.localScale = copy;
-        cube.transform.position = last + (between / 2.0f);
-        cube.transform.LookAt(next);
-        track.Enqueue(cube);
-        while (cam.WorldToViewportPoint(track.Peek().transform.position).x < -0.5f)
+    void updateLine(long id)
+    {
+        bool removePrevious = id >= 3;
+        id *= numSegmentsInViewport;
+        int numToRemove = 0;
+        for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < 0.1f; numToRemove++)
+            ;
+
+        Debug.Log("Remove: " + numToRemove.ToString());
+        Debug.Log("Pos id: " + id.ToString());
+        linePositions2.RemoveRange(0, numToRemove);
+        linePositions3.RemoveRange(0, numToRemove);
+        for (int i = 0; i < numSegmentsInViewport; i++)
         {
-            Destroy(track.Dequeue());
-            if (track.Count == 0)
-                break;
+            var next = new Vector3(id * segmentWidth, getNoise(id), 0.0f);
+            linePositions2.Add(next);
+            linePositions3.Add(next);
+            id++;
         }
-        last = next;
-        return cube;
+
+        Debug.Log(linePositions3.Count);
+
+        foreach(var pos in linePositions3.ToArray()) {
+            Debug.Log(pos);
+        }
+
+        line.GetComponent<EdgeCollider2D>().points = linePositions2.ToArray();
+        line.GetComponent<LineRenderer>().positionCount = linePositions3.Count;
+        line.GetComponent<LineRenderer>().SetPositions(linePositions3.ToArray());
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (++framesSinceUpdate >= frameBetweenUpdates)
+        if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
         {
-            var cube = addCube(++updates);
-            framesSinceUpdate = 0;
+            updateLine(++lineIndex);
         }
 
-        if (updates % noiseUpdateLength == 0 && numNoises < noiseWeights.Length) {
+        if (lineIndex % noiseUpdateLength == 0 && numNoises < noiseWeights.Length) {
             incrementNoise();
         }
 
-        var position_copy = last;
-        position_copy.x -= cam.orthographicSize * 2.1f;
-        position_copy.y = 0;
-        position_copy.z = -10.0f;
-        cam.transform.position = Vector3.MoveTowards(cam.transform.position, position_copy, 1.0f / frameBetweenUpdates);
+        cam.transform.position += new Vector3(Time.fixedDeltaTime * 100,0f, 0f);
     }
 }
