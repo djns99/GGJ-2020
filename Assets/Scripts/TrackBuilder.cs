@@ -31,7 +31,11 @@ public class TrackBuilder : MonoBehaviour
     float trackSeed;
 
     float getNoise(long val) {
-        var camHeight = cam.orthographicSize * 0.9f;
+
+        if(numNoises == 0)
+            return 0;
+
+        var maxTrackBounds = camHeight * 0.9f;
 
         bool fadeIn = noiseFadeIn != -1;
         float fadeInMultiplier = 1.0f;
@@ -59,7 +63,7 @@ public class TrackBuilder : MonoBehaviour
 
         // Normalise to between 0-1
         noise /= maxNoise;
-        return noise * camHeight - camHeight / 2;
+        return noise * maxTrackBounds - maxTrackBounds / 2;
     }
 
     void incrementNoise() {
@@ -97,8 +101,6 @@ public class TrackBuilder : MonoBehaviour
         }
 
         line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
-
-        incrementNoise();
 
         updateLine(0);
         updateLine(1);
