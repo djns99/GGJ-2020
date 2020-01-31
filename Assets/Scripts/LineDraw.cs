@@ -24,6 +24,9 @@ public class LineDraw : MonoBehaviour
         if( Input.GetMouseButtonDown( 0 ) )
         {
             current_line = Instantiate(line, Vector3.zero, Quaternion.identity);
+            var rig = current_line.GetComponent<Rigidbody2D>();
+            rig.isKinematic = true;
+
             line_renderer = current_line.GetComponent<LineRenderer>();
             edge_collider = current_line.GetComponent<EdgeCollider2D>();
 
@@ -47,6 +50,11 @@ public class LineDraw : MonoBehaviour
                 line_renderer.SetPosition(line_points.Count - 1, line_points[line_points.Count - 1]);
                 edge_collider.points = line_points.ToArray();
             }
+        }
+        if( Input.GetMouseButtonUp( 0 ) )
+        {
+            var rig = current_line.GetComponent<Rigidbody2D>();
+            rig.isKinematic = false;
         }
     }
 }
