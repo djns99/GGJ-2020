@@ -7,7 +7,7 @@ public class LineDraw : MonoBehaviour
     public GameObject line;
     public GameObject current_line;
     public LineRenderer line_renderer;
-    public EdgeCollider2D edge_collider;
+    public PolygonCollider2D edge_collider;
     public List<Vector2> line_points;
 
 
@@ -28,7 +28,7 @@ public class LineDraw : MonoBehaviour
             rig.isKinematic = true;
 
             line_renderer = current_line.GetComponent<LineRenderer>();
-            edge_collider = current_line.GetComponent<EdgeCollider2D>();
+            edge_collider = current_line.GetComponent<PolygonCollider2D>();
 
             line_points.Clear();
 

@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4197331468814853806}
   - component: {fileID: 3715330928023173690}
-  - component: {fileID: 2231720298870247150}
   - component: {fileID: 2120102579235019145}
+  - component: {fileID: 271052091}
   m_Layer: 0
   m_Name: Line
   m_TagString: Untagged
@@ -26,7 +26,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2450625885273470301}
-  m_LocalRotation: {x: -0, y: 0.0038532286, z: -0, w: 0.9999926}
+  m_LocalRotation: {x: 0, y: 0.0038571318, z: 0, w: 0.99999255}
   m_LocalPosition: {x: 0.73909104, y: -0.23350939, z: -4.807128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -130,24 +130,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 0
   m_Loop: 0
---- !u!68 &2231720298870247150
-EdgeCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2450625885273470301}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_EdgeRadius: 0
-  m_Points:
-  - {x: -0.9300504, y: 0.23350939}
-  - {x: 4.36995, y: 0.23350939}
 --- !u!50 &2120102579235019145
 Rigidbody2D:
   serializedVersion: 4
@@ -169,3 +151,32 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!60 &271052091
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2450625885273470301}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.01320212, y: 0.15544105}
+      - {x: -0.020389035, y: -0.12349415}
+      - {x: 5.0073104, y: -0.14824772}
+      - {x: 4.9996614, y: 0.11044741}
