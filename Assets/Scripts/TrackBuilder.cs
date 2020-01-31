@@ -14,13 +14,13 @@ public class TrackBuilder : MonoBehaviour
     long lineIndex = 1;
 
     public int numNoises = 1;
-    float[] noiseWeights = { 1.0f, 0.1f, 0.5f };
-    float[] noiseMultipliers = { 0.01f, 0.1f, 0.05f };
+    float[] noiseWeights = { 1.0f, 0.1f, 0.5f, 1.0f, 1.5f };
+    float[] noiseMultipliers = { 0.01f, 0.1f, 0.05f, 0.01f, 0.01f };
     float maxNoise = 0;
     long noiseUpdateLength = 10;
 
 
-    int noiseFadeInLength = 10;
+    public int noiseFadeInLength = 10;
     int noiseFadeIn = -1;
     int noiseFadeInIndex = 1;
 
