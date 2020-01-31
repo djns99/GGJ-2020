@@ -8,23 +8,27 @@ public class TrackBuilder : MonoBehaviour
     private GameObject line;
     private List<Vector2> linePositions2 = new List<Vector2>();
     private List<Vector3> linePositions3 = new List<Vector3>();
-    public int segmentWidth = 50;
+    public float segmentWidth = 50;
     private int numSegmentsInViewport;
 
     long lineIndex = 1;
 
-    public int numNoises = 1;
-    float[] noiseWeights = { 1.0f, 0.1f, 0.5f, 1.0f, 1.5f };
-    float[] noiseMultipliers = { 0.01f, 0.1f, 0.05f, 0.01f, 0.01f };
+    public int numNoises = 0;
+    float[] noiseWeights = { 1.0f, 0.1f, 0.1f, 0.01f, 0.001f };
+    float[] noiseMultipliers = { 0.01f, 0.1f, 0.2f, 0.5f, 1.0f };
     float maxNoise = 0;
+    float targetNoise = 0;
     long noiseUpdateLength = 10;
 
-
-    public int noiseFadeInLength = 10;
+    public int noiseFadeInLength = -1;
     int noiseFadeIn = -1;
     int noiseFadeInIndex = 1;
 
     Camera cam;
+    float camHeight;
+    float camWidth;
+
+    float trackSeed;
 
     float getNoise(long val) {
         var camHeight = cam.orthographicSize * 0.9f;
@@ -33,18 +37,24 @@ public class TrackBuilder : MonoBehaviour
         float fadeInMultiplier = 1.0f;
         if (fadeIn)
         {
-            fadeInMultiplier = (float)noiseFadeIn / noiseFadeInLength;
-            noiseFadeIn++;
-            if (noiseFadeIn >= noiseFadeInLength)
+            maxNoise = Mathf.MoveTowards(maxNoise, targetNoise, 1.0f / noiseFadeInLength);
+            fadeInMultiplier = noiseFadeIn / (float)noiseFadeInLength;
+            if (++noiseFadeIn >= noiseFadeInLength)
             {
                 noiseFadeIn = -1;
+                maxNoise = targetNoise;
             }
         }
 
         float noise = 0;
-        for (int i = 0; i < numNoises; i++) {
-
-            noise += Mathf.PerlinNoise(val * noiseMultipliers[i], 0.0f) * noiseWeights[i] * (i >= noiseFadeInIndex  ? fadeInMultiplier : 1.0f);
+        for (int i = 0; i < numNoises; i++)
+        {
+            bool shouldDampen = fadeIn && i >= noiseFadeInIndex;
+            float dampening = shouldDampen ? fadeInMultiplier : 1.0f;
+            float roundNoise = Mathf.PerlinNoise(val * segmentWidth * noiseMultipliers[i], trackSeed);
+            Debug.Assert(roundNoise < 1.5 && roundNoise > -0.5);
+            float finalNoise = roundNoise * noiseWeights[i] * dampening;
+            noise += finalNoise;
         }
 
         // Normalise to between 0-1
@@ -57,26 +67,38 @@ public class TrackBuilder : MonoBehaviour
         {
             noiseFadeIn = 0;
             noiseFadeInIndex = numNoises;
-            numNoises++;
         }
         else
         {
             noiseFadeIn = 0;
         }
+
+        numNoises++;
+
+        targetNoise = 0.0f;
+        for (int i = 0; i < numNoises; i++)
+        {
+            targetNoise += noiseWeights[i];
+        }
     }
+
 
     // Start is called before the first frame update
     void Start()
     {
+        trackSeed = Random.Range(0, 100f);
         cam = Camera.main;
-        line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
-        int width = (int)(cam.orthographicSize * cam.aspect * 2);
-        numSegmentsInViewport = (int)(width / segmentWidth);
-
-        maxNoise = 0.0f;
-        for (int i = 0; i < numNoises; i++) {
-            maxNoise += noiseWeights[i];
+        camHeight = cam.orthographicSize * 2;
+        camWidth = camHeight * cam.aspect;
+        numSegmentsInViewport = Mathf.CeilToInt(camWidth / segmentWidth);
+        if (noiseFadeInLength == -1)
+        {
+            noiseFadeInLength = numSegmentsInViewport;
         }
+
+        line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
+
+        incrementNoise();
 
         updateLine(0);
         updateLine(1);
@@ -91,11 +113,10 @@ public class TrackBuilder : MonoBehaviour
 
     void updateLine(long id)
     {
-        int width = (int)(cam.orthographicSize * cam.aspect * 2);
         bool removePrevious = id >= 3;
         id *= numSegmentsInViewport;
         int numToRemove = 0;
-        for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < 0.1f; numToRemove++)
+        for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < -0.1f; numToRemove++)
             ;
 
         linePositions2.RemoveRange(0, numToRemove);
@@ -108,7 +129,7 @@ public class TrackBuilder : MonoBehaviour
 
         for (int i = 0; i < numSegmentsInViewport; i++)
         {
-            var next = new Vector3(id * segmentWidth - width, getNoise(id), 0.0f);
+            var next = new Vector3(id * segmentWidth - camWidth, getNoise(id), 0.0f);
             addPointToLinePos(next);
             id++;
         }
