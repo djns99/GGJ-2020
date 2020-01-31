@@ -17,10 +17,8 @@ public class CameraFollowing : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        currCarPos = followingObject.transform.localPosition;
-        Vector3 newCamPos = new Vector3(prevCarPos.x - currCarPos.x, 0, 0);
-        Debug.Log(newCamPos);
-        transform.position -= newCamPos;
-        prevCarPos = followingObject.transform.localPosition;
+        currCarPos = followingObject.transform.position;
+        Vector3 newCamPos = new Vector3(currCarPos.x, transform.position.y, transform.position.z);
+        transform.position = newCamPos;
     }
 }
