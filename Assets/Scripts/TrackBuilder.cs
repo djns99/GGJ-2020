@@ -11,19 +11,66 @@ public class TrackBuilder : MonoBehaviour
     long updates = 1;
     public long frameBetweenUpdates = 1;
     long framesSinceUpdate = 0;
+    public int numNoises = 1;
+    float[] noiseWeights = { 1.0f, 0.1f, 0.5f };
+    float[] noiseMultipliers = { 0.01f, 0.1f, 0.05f };
+    float maxNoise = 0;
+    long noiseUpdateLength = 1000;
+
+    int noiseFadeInLength = 10;
+    int noiseFadeIn = -1;
+    int noiseFadeInIndex = 1;
 
     Camera cam;
 
     float getNoise(long val) {
         var camHeight = cam.orthographicSize * 0.9f;
-        return Mathf.PerlinNoise(val * 0.01f, 0.0f) * camHeight - camHeight / 2;
+
+        bool fadeIn = noiseFadeIn != -1;
+        float fadeInMultiplier = 1.0f;
+        if (fadeIn)
+        {
+            fadeInMultiplier = (float)noiseFadeIn / noiseFadeInLength;
+            noiseFadeIn++;
+            if (noiseFadeIn >= noiseFadeInLength)
+            {
+                noiseFadeIn = -1;
+            }
+        }
+
+        float noise = 0;
+        for (int i = 0; i < numNoises; i++) {
+
+            noise += Mathf.PerlinNoise(val * noiseMultipliers[i], 0.0f) * noiseWeights[i] * (i >= noiseFadeInIndex  ? fadeInMultiplier : 1.0f);
+        }
+
+        // Normalise to between 0-1
+        noise /= maxNoise;
+        return noise * camHeight - camHeight / 2;
     }
 
+    void incrementNoise() {
+        if (noiseFadeIn == -1)
+        {
+            noiseFadeIn = 0;
+            noiseFadeInIndex = numNoises;
+            numNoises++;
+        }
+        else
+        {
+            noiseFadeIn = 0;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         cam = Camera.main;
+
+        maxNoise = 0.0f;
+        for (int i = 0; i < numNoises; i++) {
+            maxNoise += noiseWeights[i];
+        }
 
         var cube = Instantiate(trackElement, new Vector3(), Quaternion.identity);
         var camHeight = cam.orthographicSize * 0.9f;
@@ -59,6 +106,10 @@ public class TrackBuilder : MonoBehaviour
         {
             var cube = addCube(++updates);
             framesSinceUpdate = 0;
+        }
+
+        if (updates % noiseUpdateLength == 0 && numNoises < noiseWeights.Length) {
+            incrementNoise();
         }
 
         var position_copy = last;
