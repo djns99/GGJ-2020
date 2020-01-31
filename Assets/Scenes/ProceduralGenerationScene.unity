@@ -217,9 +217,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba6393e2846f2a4db2e243f09038370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trackElement: {fileID: 6897298473756233714, guid: ff33040a2f5bf45499f4c942684e84bb,
+  trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
     type: 3}
-  frameBetweenUpdates: 1
+  segmentWidth: 1
   numNoises: 1
 --- !u!1 &878559929
 GameObject:
