@@ -8,23 +8,27 @@ public class TrackBuilder : MonoBehaviour
     private GameObject line;
     private List<Vector2> linePositions2 = new List<Vector2>();
     private List<Vector3> linePositions3 = new List<Vector3>();
-    public int segmentWidth = 10;
+    public float segmentWidth = 50;
     private int numSegmentsInViewport;
 
     long lineIndex = 1;
 
-    public int numNoises = 1;
-    float[] noiseWeights = { 1.0f, 0.1f, 0.5f };
-    float[] noiseMultipliers = { 0.01f, 0.1f, 0.05f };
+    public int numNoises = 0;
+    float[] noiseWeights = { 1.0f, 0.1f, 0.1f, 0.01f, 0.001f };
+    float[] noiseMultipliers = { 0.01f, 0.1f, 0.2f, 0.5f, 1.0f };
     float maxNoise = 0;
+    float targetNoise = 0;
     long noiseUpdateLength = 10;
 
-
-    int noiseFadeInLength = 10;
+    public int noiseFadeInLength = -1;
     int noiseFadeIn = -1;
     int noiseFadeInIndex = 1;
 
     Camera cam;
+    float camHeight;
+    float camWidth;
+
+    float trackSeed;
 
     float getNoise(long val) {
         var camHeight = cam.orthographicSize * 0.9f;
@@ -33,18 +37,24 @@ public class TrackBuilder : MonoBehaviour
         float fadeInMultiplier = 1.0f;
         if (fadeIn)
         {
-            fadeInMultiplier = (float)noiseFadeIn / noiseFadeInLength;
-            noiseFadeIn++;
-            if (noiseFadeIn >= noiseFadeInLength)
+            maxNoise = Mathf.MoveTowards(maxNoise, targetNoise, 1.0f / noiseFadeInLength);
+            fadeInMultiplier = noiseFadeIn / (float)noiseFadeInLength;
+            if (++noiseFadeIn >= noiseFadeInLength)
             {
                 noiseFadeIn = -1;
+                maxNoise = targetNoise;
             }
         }
 
         float noise = 0;
-        for (int i = 0; i < numNoises; i++) {
-
-            noise += Mathf.PerlinNoise(val * noiseMultipliers[i], 0.0f) * noiseWeights[i] * (i >= noiseFadeInIndex  ? fadeInMultiplier : 1.0f);
+        for (int i = 0; i < numNoises; i++)
+        {
+            bool shouldDampen = fadeIn && i >= noiseFadeInIndex;
+            float dampening = shouldDampen ? fadeInMultiplier : 1.0f;
+            float roundNoise = Mathf.PerlinNoise(val * segmentWidth * noiseMultipliers[i], trackSeed);
+            Debug.Assert(roundNoise < 1.5 && roundNoise > -0.5);
+            float finalNoise = roundNoise * noiseWeights[i] * dampening;
+            noise += finalNoise;
         }
 
         // Normalise to between 0-1
@@ -57,26 +67,38 @@ public class TrackBuilder : MonoBehaviour
         {
             noiseFadeIn = 0;
             noiseFadeInIndex = numNoises;
-            numNoises++;
         }
         else
         {
             noiseFadeIn = 0;
         }
+
+        numNoises++;
+
+        targetNoise = 0.0f;
+        for (int i = 0; i < numNoises; i++)
+        {
+            targetNoise += noiseWeights[i];
+        }
     }
+
 
     // Start is called before the first frame update
     void Start()
     {
+        trackSeed = Random.Range(0, 100f);
         cam = Camera.main;
-        line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
-        int width = (int)(cam.orthographicSize * cam.aspect * 2);
-        numSegmentsInViewport = (int)(width / segmentWidth);
-
-        maxNoise = 0.0f;
-        for (int i = 0; i < numNoises; i++) {
-            maxNoise += noiseWeights[i];
+        camHeight = cam.orthographicSize * 2;
+        camWidth = camHeight * cam.aspect;
+        numSegmentsInViewport = Mathf.CeilToInt(camWidth / segmentWidth);
+        if (noiseFadeInLength == -1)
+        {
+            noiseFadeInLength = numSegmentsInViewport;
         }
+
+        line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
+
+        incrementNoise();
 
         updateLine(0);
         updateLine(1);
@@ -84,50 +106,59 @@ public class TrackBuilder : MonoBehaviour
         lineIndex = 2;
     }
 
+    void addPointToLinePos(Vector3 vec) {
+        linePositions2.Add(vec);
+        linePositions3.Add(vec);
+    }
+
     void updateLine(long id)
     {
-        int width = (int)(cam.orthographicSize * cam.aspect * 2);
         bool removePrevious = id >= 3;
         id *= numSegmentsInViewport;
         int numToRemove = 0;
-        for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < 0.1f; numToRemove++)
+        for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < -0.1f; numToRemove++)
             ;
 
-        Debug.Log("Remove: " + numToRemove.ToString());
-        Debug.Log("Pos id: " + id.ToString());
         linePositions2.RemoveRange(0, numToRemove);
         linePositions3.RemoveRange(0, numToRemove);
+
+        if (linePositions2.Count > 0)
+        {
+            linePositions2.RemoveRange(linePositions2.Count - 2, 2);
+        }
+
         for (int i = 0; i < numSegmentsInViewport; i++)
         {
-            var next = new Vector3(id * segmentWidth - width, getNoise(id), 0.0f);
-            linePositions2.Add(next);
-            linePositions3.Add(next);
+            var next = new Vector3(id * segmentWidth - camWidth, getNoise(id), 0.0f);
+            addPointToLinePos(next);
             id++;
         }
 
-        Debug.Log(linePositions3.Count);
+        Vector3 first = linePositions3[0];
+        Vector3 last = linePositions3[linePositions3.Count - 1];
+        last.y = -cam.orthographicSize * 4;
+        linePositions2.Add(last);
+        first.y = -cam.orthographicSize * 4;
+        linePositions2.Add(first);
 
-        foreach(var pos in linePositions3.ToArray()) {
-            Debug.Log(pos);
-        }
-
-        line.GetComponent<EdgeCollider2D>().points = linePositions2.ToArray();
-        line.GetComponent<LineRenderer>().positionCount = linePositions3.Count;
-        line.GetComponent<LineRenderer>().SetPositions(linePositions3.ToArray());
+        var collider = line.GetComponent<PolygonCollider2D>();
+        collider.SetPath(0, linePositions2.ToArray());
+        var line_renderer = line.GetComponent<LineRenderer>();
+        line_renderer.positionCount = linePositions3.Count;
+        line_renderer.SetPositions(linePositions3.ToArray());
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
         {
             updateLine(++lineIndex);
-        }
 
-        if (lineIndex % noiseUpdateLength == 0 && numNoises < noiseWeights.Length) {
-            incrementNoise();
+            if (lineIndex % noiseUpdateLength == 0 && numNoises < noiseWeights.Length)
+            {
+                incrementNoise();
+            }
         }
-
-        //cam.transform.position += new Vector3(Time.fixedDeltaTime * 100,0f, 0f);
     }
 }
