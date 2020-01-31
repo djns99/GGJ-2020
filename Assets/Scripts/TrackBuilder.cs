@@ -8,7 +8,7 @@ public class TrackBuilder : MonoBehaviour
     private GameObject line;
     private List<Vector2> linePositions2 = new List<Vector2>();
     private List<Vector3> linePositions3 = new List<Vector3>();
-    public int segmentWidth = 10;
+    public int segmentWidth = 50;
     private int numSegmentsInViewport;
 
     long lineIndex = 1;
@@ -84,6 +84,11 @@ public class TrackBuilder : MonoBehaviour
         lineIndex = 2;
     }
 
+    void addPointToLinePos(Vector3 vec) {
+        linePositions2.Add(vec);
+        linePositions3.Add(vec);
+    }
+
     void updateLine(long id)
     {
         int width = (int)(cam.orthographicSize * cam.aspect * 2);
@@ -93,33 +98,40 @@ public class TrackBuilder : MonoBehaviour
         for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < 0.1f; numToRemove++)
             ;
 
-        Debug.Log("Remove: " + numToRemove.ToString());
-        Debug.Log("Pos id: " + id.ToString());
         linePositions2.RemoveRange(0, numToRemove);
         linePositions3.RemoveRange(0, numToRemove);
+
+        if (linePositions2.Count > 0)
+        {
+            linePositions2.RemoveRange(linePositions2.Count - 2, 2);
+            linePositions3.RemoveRange(linePositions3.Count - 2, 2);
+        }
+
         for (int i = 0; i < numSegmentsInViewport; i++)
         {
             var next = new Vector3(id * segmentWidth - width, getNoise(id), 0.0f);
-            linePositions2.Add(next);
-            linePositions3.Add(next);
+            addPointToLinePos(next);
             id++;
         }
 
-        Debug.Log(linePositions3.Count);
+        Vector3 first = linePositions3[0];
+        Vector3 last = linePositions3[linePositions3.Count - 1];
+        last.y = -cam.orthographicSize * 4;
+        addPointToLinePos(last);
+        first.y = -cam.orthographicSize * 4;
+        addPointToLinePos(first);
 
-        foreach(var pos in linePositions3.ToArray()) {
-            Debug.Log(pos);
-        }
-
-        line.GetComponent<EdgeCollider2D>().points = linePositions2.ToArray();
-        line.GetComponent<LineRenderer>().positionCount = linePositions3.Count;
-        line.GetComponent<LineRenderer>().SetPositions(linePositions3.ToArray());
+        var collider = line.GetComponent<PolygonCollider2D>();
+        collider.SetPath(0, linePositions2.ToArray());
+        var line_renderer = line.GetComponent<LineRenderer>();
+        line_renderer.positionCount = linePositions3.Count;
+        line_renderer.SetPositions(linePositions3.ToArray());
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
-        if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
+        if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 3]).x < 1.1f)
         {
             updateLine(++lineIndex);
         }
@@ -127,7 +139,5 @@ public class TrackBuilder : MonoBehaviour
         if (lineIndex % noiseUpdateLength == 0 && numNoises < noiseWeights.Length) {
             incrementNoise();
         }
-
-        //cam.transform.position += new Vector3(Time.fixedDeltaTime * 100,0f, 0f);
     }
 }
