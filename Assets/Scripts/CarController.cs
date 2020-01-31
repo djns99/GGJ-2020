@@ -20,10 +20,7 @@ public class CarController : MonoBehaviour
     {
         foreach (CarComponent cc in carComponents)
         {
-            if (cc.collideWithGround)
-            {
-                return true;
-            }
+            if (cc.collideWithGround) return true;
         }
         return false;
     }

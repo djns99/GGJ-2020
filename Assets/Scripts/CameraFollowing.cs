@@ -18,7 +18,7 @@ public class CameraFollowing : MonoBehaviour
     void FixedUpdate()
     {
         currCarPos = followingObject.transform.position;
-        Vector3 newCamPos = new Vector3(currCarPos.x, transform.position.y, transform.position.z);
+        Vector3 newCamPos = new Vector3(currCarPos.x + 20, transform.position.y, transform.position.z);
         transform.position = newCamPos;
     }
 }
