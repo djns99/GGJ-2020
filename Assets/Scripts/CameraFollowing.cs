@@ -5,17 +5,20 @@ using UnityEngine;
 public class CameraFollowing : MonoBehaviour
 {
     private Transform followingObject;
+    private Vector3 prevCarPos;
+    private Vector3 currCarPos;
     // Start is called before the first frame update
     void Start()
     {
         followingObject = GameObject.FindGameObjectWithTag("Player").transform;
+        prevCarPos = followingObject.transform.localPosition;
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        Vector3 playerPosition = followingObject.position;
-
-       // transform.position = playerPosition;
+        currCarPos = followingObject.transform.position;
+        Vector3 newCamPos = new Vector3(currCarPos.x, transform.position.y, transform.position.z);
+        transform.position = newCamPos;
     }
 }
