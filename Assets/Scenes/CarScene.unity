@@ -235,6 +235,7 @@ Transform:
   - {fileID: 1741671112}
   - {fileID: 1723363532}
   - {fileID: 26664850}
+  - {fileID: 2049732211}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1006,6 +1007,7 @@ GameObject:
   - component: {fileID: 1946162265}
   - component: {fileID: 1946162266}
   - component: {fileID: 1946162267}
+  - component: {fileID: 1946162268}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1098,7 +1100,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1946162261}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ba6393e2846f2a4db2e243f09038370, type: 3}
   m_Name: 
@@ -1126,6 +1128,23 @@ MonoBehaviour:
   poly_collider: {fileID: 0}
   line_points: []
   collision_points: []
+--- !u!114 &1946162268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946162261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bde47454b3cf9748811715acb291f38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
+    type: 3}
+  segmentWidth: 1
+  minSegmentsBetweenObstacle: 500
+  maxSegmentsBetweenObstacle: 10000
 --- !u!1 &2049732208
 GameObject:
   m_ObjectHideFlags: 0
@@ -1163,7 +1182,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -1222,7 +1241,7 @@ ParticleSystem:
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   useUnscaledTime: 0
@@ -1344,7 +1363,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 4
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -2151,7 +2170,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 25
+        scalar: 10
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -5931,13 +5950,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2049732208}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_Father: {fileID: 408819205}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2138652900
 GameObject:
   m_ObjectHideFlags: 0
