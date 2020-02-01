@@ -33,6 +33,7 @@ public class SimpleTrackBuilder : MonoBehaviour
     private float trackAllowedRangeMin;
     private float trackAllowedRangeMax;
 
+
     Camera cam;
     float camHeight;
     float camWidth;
@@ -49,8 +50,10 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     void addPointToLinePos(Vector3 vec)
     {
-        linePositions2.Add(vec);
+        vec.z = -1;
         linePositions3.Add(vec);
+        vec.y += trackElement.GetComponent<LineRenderer>().startWidth / 2;
+        linePositions2.Add(vec);
     }
 
     float getSlerpHeight(float start, float end, float progress)
@@ -283,6 +286,52 @@ public class SimpleTrackBuilder : MonoBehaviour
         createNewLine();
     }
 
+    void flatGap()
+    {
+        createNewLine();
+
+        var lastPos = linePositions3[0];
+        // Transition into a flat line
+        var pos = smoothIntoFlat(lastPos, getLinePointAtIndex(lines.Last.Value, -2));
+
+        // Start new line so we can retexture
+        createNewLine();
+
+        //TODO Do texturing etc
+        int numLeadIn = 25;
+        pos.x += segmentWidth * numLeadIn;
+        progress += numLeadIn;
+        addPointToLinePos(pos);
+
+        // End left half
+        createNewLine();
+
+        // Gap
+        float targetWidth = gapWidthPixels;
+        int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
+        float realWidth = numSegments * segmentWidth;
+        progress += numSegments;
+
+        // Clear automatically added link
+        linePositions2.Clear();
+        linePositions3.Clear();
+
+        pos.x += realWidth;
+        int numTrailOff = 25;
+        addPointToLinePos(pos);
+        pos.x += segmentWidth * numTrailOff;
+        progress += numTrailOff;
+        addPointToLinePos(pos);
+
+        // End obstalce
+        createNewLine();
+
+        // Ease back into normal oepration
+        bezeirCurveBackToPerlin(pos);
+
+        createNewLine();
+    }
+
     void jumpCliff() {
         createNewLine();
 
@@ -397,28 +446,28 @@ public class SimpleTrackBuilder : MonoBehaviour
         bezeirCurveBackToPerlin(pos);
     }
 
-    void bumpyGround()
-    {
-        var numSegments = Mathf.CeilToInt(bumpyGroundLength / segmentWidth);
-        int segmentsDampening = 20;
-        for (int i = 0; i < numSegments + segmentsDampening * 2; i++)
-        {
-            // Continue with noise
-            var noise1 = getNoise(progress);
-            var noise2 = getNoise(progress, bumpyGroundNoise) * bumpyGroundWeight;
-            if (i < segmentsDampening)
-            {
-                noise2 *= (float)i / segmentsDampening;
-            }
-            else if(i >= numSegments + segmentsDampening)
-            {
-                noise2 *= 1.0f - (float)(i - numSegments - segmentsDampening) / segmentsDampening;
-            }
-            var next = new Vector3(progress * segmentWidth - camWidth, noise1 + noise2, 0.0f);
-            addPointToLinePos(next);
-            progress++;
-        }
-    }
+    //void bumpyGround()
+    //{
+    //    var numSegments = Mathf.CeilToInt(bumpyGroundLength / segmentWidth);
+    //    int segmentsDampening = 20;
+    //    for (int i = 0; i < numSegments + segmentsDampening * 2; i++)
+    //    {
+    //        // Continue with noise
+    //        var noise1 = getNoise(progress);
+    //        var noise2 = getNoise(progress, bumpyGroundNoise) * bumpyGroundWeight;
+    //        if (i < segmentsDampening)
+    //        {
+    //            noise2 *= (float)i / segmentsDampening;
+    //        }
+    //        else if(i >= numSegments + segmentsDampening)
+    //        {
+    //            noise2 *= 1.0f - (float)(i - numSegments - segmentsDampening) / segmentsDampening;
+    //        }
+    //        var next = new Vector3(progress * segmentWidth - camWidth, noise1 + noise2, 0.0f);
+    //        addPointToLinePos(next);
+    //        progress++;
+    //    }
+    //}
 
     void spikePit() {
         createNewLine();
@@ -483,25 +532,27 @@ public class SimpleTrackBuilder : MonoBehaviour
     void addObstacle()
     {
 
-        int numObstacles = 5;
+        int numObstacles = 6;
         int objectId = Random.Range(0, numObstacles);
         switch (objectId)
         {
             case 0:
-                gap();
+                flatGap();
                 return;
             case 1:
-                cliffUp();
+                gap();
                 return;
             case 2:
-                cliffDown();
+                cliffUp();
                 return;
             case 3:
-                jumpCliff();
+                cliffDown();
                 return;
             case 4:
+                jumpCliff();
+                return;
+            case 5:
                 spikePit();
-                //bumpyGround();
                 return;
         }
     }
