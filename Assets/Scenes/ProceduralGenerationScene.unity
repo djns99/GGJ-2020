@@ -132,7 +132,6 @@ GameObject:
   - component: {fileID: 272571147}
   - component: {fileID: 272571146}
   - component: {fileID: 272571145}
-  - component: {fileID: 272571148}
   - component: {fileID: 272571149}
   - component: {fileID: 272571150}
   m_Layer: 0
@@ -207,23 +206,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &272571148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 272571144}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ba6393e2846f2a4db2e243f09038370, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
-    type: 3}
-  segmentWidth: 0.5
-  numNoises: 0
-  noiseFadeInLength: -1
 --- !u!114 &272571149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,11 +234,13 @@ MonoBehaviour:
     type: 3}
   segmentWidth: 1
   minSegmentsBetweenObstacle: 50
-  maxSegmentsBetweenObstacle: 10000
+  maxSegmentsBetweenObstacle: 500
   cameraTrackMinPercent: 0.025
   cameraTrackMaxPercent: 0.4
-  targetGapWidthPixels: 20
+  gapWidthPixels: 20
   maxCliffHeightPixels: 20
+  jumpCliffWidthPixels: 20
+  jumpCliffMaxHeightPixels: 20
 --- !u!1 &878559929
 GameObject:
   m_ObjectHideFlags: 0
