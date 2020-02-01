@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CarController : MonoBehaviour
 {
@@ -26,6 +27,9 @@ public class CarController : MonoBehaviour
 
     private void Start()
     {
+        //Reset
+        GameManager.Instance.score = 0;
+
         carBody = transform.Find("Body").GetComponent<Rigidbody2D>();
         carComponents = transform.GetComponentsInChildren<CarComponent>();
         carPieces = new List<Transform>();
@@ -34,14 +38,6 @@ public class CarController : MonoBehaviour
         {
             carPieces.Add(child);
             compDirections.Add(child.position);
-        }
-
-        // Spawn car on line
-        RaycastHit2D hit = Physics2D.Raycast(carBody.transform.position, Vector3.down);
-        if (hit.collider != null)
-        {
-            
-            print("Hit: " + hit.collider.gameObject.name);
         }
     }
 
@@ -155,5 +151,6 @@ public class CarController : MonoBehaviour
     private void OnDestroy()
     {
         Debug.Log("Car went boom!");
+        SceneManager.LoadScene(3);
     }
 }
