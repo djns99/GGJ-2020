@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Line : MonoBehaviour
 {
-    private float aliveCounter = 10f;
+    private float aliveCounter = 100f;
 
     private void Update()
     {
