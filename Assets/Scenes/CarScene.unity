@@ -1206,7 +1206,7 @@ MonoBehaviour:
     type: 3}
   segmentWidth: 1
   minSegmentsBetweenObstacle: 30
-  maxSegmentsBetweenObstacle: 200
+  maxSegmentsBetweenObstacle: 50
   cameraTrackMinPercent: 0.1
   cameraTrackMaxPercent: 0.6
   gapWidthPixels: 20
