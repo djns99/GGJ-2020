@@ -474,7 +474,7 @@ MonoBehaviour:
   isExploding: 0
   carStoppingCounter: 0
   prevSpeed: 0
-  crashingSound: {fileID: 8300000, guid: 9dbed06a4599f2f4e8e3ff46ed5ed00c, type: 3}
+  crashingSound: {fileID: 8300000, guid: e787d0f4dddcfa5408868c95d7c46cb1, type: 3}
 --- !u!1 &551323636
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,8 +1490,8 @@ MonoBehaviour:
   trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
     type: 3}
   segmentWidth: 1
-  minSegmentsBetweenObstacle: 30
-  maxSegmentsBetweenObstacle: 50
+  minSegmentsBetweenObstacle: 0
+  maxSegmentsBetweenObstacle: 15
   cameraTrackMinPercent: 0.1
   cameraTrackMaxPercent: 0.6
   gapWidthPixels: 20

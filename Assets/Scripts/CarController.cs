@@ -97,7 +97,7 @@ public class CarController : MonoBehaviour
         if (carBody.velocity.magnitude <= 0.8f)
         {
             carStoppingCounter += Time.deltaTime;
-            if (carStoppingCounter >= 2f)
+            if (carStoppingCounter >= 1f)
             {
                 isExploding = true;
             }
@@ -120,7 +120,7 @@ public class CarController : MonoBehaviour
         List<Transform> wheels = carPieces.FindAll(element => (element.name.Contains("Front") || element.name.Contains("Back")));
         foreach (Transform wheel in wheels)
         {
-            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 8f)
+            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 6f)
             {
                 Debug.Log("wheel extended");
                 isExploding = true;
