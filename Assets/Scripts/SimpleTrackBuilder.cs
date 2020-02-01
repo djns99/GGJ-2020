@@ -8,7 +8,6 @@ public class SimpleTrackBuilder : MonoBehaviour
     private List<Vector2> linePositions2 = new List<Vector2>();
     private List<Vector3> linePositions3 = new List<Vector3>();
     private LinkedList<GameObject> lines = new LinkedList<GameObject>();
-    GameObject currentLine = null;
     public float segmentWidth = 1;
     public int minSegmentsBetweenObstacle = 500;
     public int maxSegmentsBetweenObstacle = 10000;
@@ -40,26 +39,6 @@ public class SimpleTrackBuilder : MonoBehaviour
         return noise * trackWidth + trackAllowedRangeMin;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        trackSeed = Random.Range(0, 100f);
-        cam = Camera.main;
-        camHeight = cam.orthographicSize * 2;
-        camWidth = camHeight * cam.aspect;
-        numSegmentsInViewport = Mathf.CeilToInt(camWidth / segmentWidth);
-
-        trackAllowedRangeMin = camHeight * cameraTrackMinPercent - camHeight / 2;
-        trackAllowedRangeMax = camHeight * cameraTrackMaxPercent - camHeight / 2;
-
-        nextObstacleProgressMin = Mathf.Max(minSegmentsBetweenObstacle, numSegmentsInViewport * 2);
-        nextObstacleProgressMax = nextObstacleProgressMin + (maxSegmentsBetweenObstacle - minSegmentsBetweenObstacle);
-
-        updateLine();
-        updateLine();
-        updateLine();
-    }
-
     void addPointToLinePos(Vector3 vec)
     {
         linePositions2.Add(vec);
@@ -86,7 +65,7 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     void addObstacle()
     {
-        var lastPos = getLineEndPoint(lines.Last.Value, -1);
+        var lastPos = getLinePointAtIndex(lines.Last.Value, -1);
 
         int numObstacles = 3;
         int objectId = Random.Range(0, numObstacles);
@@ -120,7 +99,7 @@ public class SimpleTrackBuilder : MonoBehaviour
                     progress += headNumSegments;
 
                     var pos = lastPos;
-                    var posPrev = getLineEndPoint(lines.Last.Value, -2);
+                    var posPrev = getLinePointAtIndex(lines.Last.Value, -2);
                     var dir = pos - posPrev;
                     for (int i = 0; i < headNumSegments; i++)
                     {
@@ -188,37 +167,35 @@ public class SimpleTrackBuilder : MonoBehaviour
     }
 
     void createNewLine() {
-
-        Debug.Log("Creating line");
-        
-        if (currentLine != null) {
-            // Dont bother creating a new line if we haven't used the last one
-            if (linePositions3.Count == 0)
-                return;
+        if (linePositions3.Count > 1)
+        {
+            var line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
 
             Vector3 first = linePositions3[0];
             Vector3 last = linePositions3[linePositions3.Count - 1];
+            Vector3 lastCopy = last;
             last.y = -camHeight * 4;
             linePositions2.Add(last);
             first.y = -camHeight * 4;
             linePositions2.Add(first);
 
-            var collider = currentLine.GetComponent<PolygonCollider2D>();
+            var collider = line.GetComponent<PolygonCollider2D>();
             collider.SetPath(0, linePositions2.ToArray());
-            var line_renderer = currentLine.GetComponent<LineRenderer>();
+            var line_renderer = line.GetComponent<LineRenderer>();
             line_renderer.positionCount = linePositions3.Count;
             line_renderer.SetPositions(linePositions3.ToArray());
-            lines.AddLast(currentLine);
-        }
+            lines.AddLast(line);
 
-        currentLine = Instantiate(trackElement, new Vector3(), Quaternion.identity);
-        linePositions2.Clear();
-        linePositions3.Clear();
+            linePositions2.Clear();
+            linePositions3.Clear();
+
+            addPointToLinePos(lastCopy);
+        }
     }
 
-    Vector3 getLineEndPoint(GameObject line, int index) {
+    Vector3 getLinePointAtIndex(GameObject line, int index) {
         var renderer = line.GetComponent<LineRenderer>();
-        return renderer.GetPosition(index >= 0 ? index + 1 : (renderer.positionCount - (-index + 1)));
+        return renderer.GetPosition(index >= 0 ? index : (renderer.positionCount + index));
     }
 
     void updateLine()
@@ -226,7 +203,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         while (lines.Count != 0)
         {
             var line = lines.First.Value;
-            if (line.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLineEndPoint(lines.First.Value, -1)).x < -0.2f)
+            if (line.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLinePointAtIndex(lines.First.Value, -1)).x < -0.2f)
             {
                 Destroy(line);
                 lines.RemoveFirst();
@@ -236,8 +213,6 @@ public class SimpleTrackBuilder : MonoBehaviour
                 break;
             }
         }
-
-        createNewLine();
 
         var endProgress = progress + numSegmentsInViewport;
         while (progress < endProgress)
@@ -264,12 +239,36 @@ public class SimpleTrackBuilder : MonoBehaviour
                 progress++;
             }
         }
+
+        createNewLine();
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        trackSeed = Random.Range(0, 100f);
+        cam = Camera.main;
+        camHeight = cam.orthographicSize * 2;
+        camWidth = camHeight * cam.aspect;
+        numSegmentsInViewport = Mathf.CeilToInt(camWidth / segmentWidth);
+
+        trackAllowedRangeMin = camHeight * cameraTrackMinPercent - camHeight / 2;
+        trackAllowedRangeMax = camHeight * cameraTrackMaxPercent - camHeight / 2;
+
+        nextObstacleProgressMin = Mathf.Max(minSegmentsBetweenObstacle, numSegmentsInViewport * 2);
+        nextObstacleProgressMax = nextObstacleProgressMin + (maxSegmentsBetweenObstacle - minSegmentsBetweenObstacle);
+
+        createNewLine();
+
+        updateLine();
+        updateLine();
+        updateLine();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (currentLine.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLineEndPoint(currentLine, -1)).x < 1.2f)
+        if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 1.2f)
         {
             updateLine();
         }
