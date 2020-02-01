@@ -17,6 +17,10 @@ public class CarController : MonoBehaviour
 
     private float originalSpeed = -3000f;
 
+    public float carStoppingCounter;
+
+    public float prevSpeed;
+
 
     private void Start()
     {
@@ -45,7 +49,6 @@ public class CarController : MonoBehaviour
     {
         if (carBody.velocity.magnitude <= 10f)
         {
-            Debug.Log(carBody.velocity.normalized);
             carBody.AddForce(transform.right * 10000);
             foreach (WheelJoint2D wheelJoint in carBody.GetComponents<WheelJoint2D>())
             {
@@ -70,25 +73,37 @@ public class CarController : MonoBehaviour
         {
             AnimateCarExplosion();
         }
-        //if (!IsCarOnGround())
-        //{
-        //    if (wasOnGround)
-        //    {
-        //        carBody.freezeRotation = true;
-        //        wasOnGround = false;
-        //    }
-        //} else
-        //{
-        //    if (!wasOnGround)
-        //    {
-        //        carBody.freezeRotation = false;
-        //        wasOnGround = true;
-        //    }
-        //}
     }
 
     private void CheckCarFlippedOrWillExplode()
     {
+        float currSpeed = carBody.velocity.magnitude;
+        Debug.Log(currSpeed + " vs " + prevSpeed);
+
+        if (prevSpeed - currSpeed >= 60f && IsCarOnGround())
+        {
+            // Dropped too fast
+            isExploding = true;
+        }
+
+        if (carBody.velocity.magnitude <= 0.7f)
+        {
+            carStoppingCounter += Time.deltaTime;
+            if (carStoppingCounter >= 2f)
+            {
+                isExploding = true;
+            }
+        } else
+        {
+            // Resets
+            carStoppingCounter = 0;
+        }
+
+        foreach (CarComponent cc in carComponents)
+        {
+            if (cc.IsOutOfScreen) isExploding = true;
+        }
+
         if (carBody.transform.up.y < -0.8f && carBody.transform.up.y > -1f && IsCarOnGround())
         {
             Debug.Log("wheel flipped");
@@ -103,7 +118,8 @@ public class CarController : MonoBehaviour
                 isExploding = true;
             }
         }
-        
+
+        prevSpeed = currSpeed;
     }
 
     public void AnimateCarExplosion()
