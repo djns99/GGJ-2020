@@ -5,9 +5,10 @@ using UnityEngine;
 public class SimpleTrackBuilder : MonoBehaviour
 {
     public GameObject trackElement;
-    private GameObject line;
     private List<Vector2> linePositions2 = new List<Vector2>();
     private List<Vector3> linePositions3 = new List<Vector3>();
+    private LinkedList<GameObject> lines = new LinkedList<GameObject>();
+    GameObject currentLine = null;
     public float segmentWidth = 1;
     public int minSegmentsBetweenObstacle = 500;
     public int maxSegmentsBetweenObstacle = 10000;
@@ -24,8 +25,6 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     private float trackAllowedRangeMin;
     private float trackAllowedRangeMax;
-
-    long lineIndex = 1;
 
     Camera cam;
     float camHeight;
@@ -53,15 +52,12 @@ public class SimpleTrackBuilder : MonoBehaviour
         trackAllowedRangeMin = camHeight * cameraTrackMinPercent - camHeight / 2;
         trackAllowedRangeMax = camHeight * cameraTrackMaxPercent - camHeight / 2;
 
-        nextObstacleProgressMin = minSegmentsBetweenObstacle;
-        nextObstacleProgressMax = maxSegmentsBetweenObstacle;
-
-        line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
+        nextObstacleProgressMin = Mathf.Max(minSegmentsBetweenObstacle, numSegmentsInViewport * 2);
+        nextObstacleProgressMax = nextObstacleProgressMin + (maxSegmentsBetweenObstacle - minSegmentsBetweenObstacle);
 
         updateLine();
         updateLine();
         updateLine();
-        lineIndex = 2;
     }
 
     void addPointToLinePos(Vector3 vec)
@@ -90,6 +86,8 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     void addObstacle()
     {
+        var lastPos = getLineEndPoint(lines.Last.Value, -1);
+
         int numObstacles = 3;
         int objectId = Random.Range(0, numObstacles);
         switch (objectId) {
@@ -101,7 +99,7 @@ public class SimpleTrackBuilder : MonoBehaviour
                     progress += numSegments;
 
                     // Drop off bottom of screen
-                    var pos = linePositions3[linePositions3.Count - 1];
+                    var pos = lastPos;
                     pos.y = -camHeight;
                     addPointToLinePos(pos);
 
@@ -121,8 +119,8 @@ public class SimpleTrackBuilder : MonoBehaviour
                     int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
                     progress += headNumSegments;
 
-                    var pos = linePositions3[linePositions3.Count - 1];
-                    var posPrev = linePositions3[linePositions3.Count - 2];
+                    var pos = lastPos;
+                    var posPrev = getLineEndPoint(lines.Last.Value, -2);
                     var dir = pos - posPrev;
                     for (int i = 0; i < headNumSegments; i++)
                     {
@@ -154,7 +152,7 @@ public class SimpleTrackBuilder : MonoBehaviour
             case 2:
                 {
                     // Cliff
-                    var pos = linePositions3[linePositions3.Count - 1];
+                    var pos = lastPos;
                     pos.y = Mathf.Max(trackAllowedRangeMin, pos.y - maxCliffHeightPixels);
                     addPointToLinePos(pos);
 
@@ -189,19 +187,57 @@ public class SimpleTrackBuilder : MonoBehaviour
         }
     }
 
+    void createNewLine() {
+
+        Debug.Log("Creating line");
+        
+        if (currentLine != null) {
+            // Dont bother creating a new line if we haven't used the last one
+            if (linePositions3.Count == 0)
+                return;
+
+            Vector3 first = linePositions3[0];
+            Vector3 last = linePositions3[linePositions3.Count - 1];
+            last.y = -camHeight * 4;
+            linePositions2.Add(last);
+            first.y = -camHeight * 4;
+            linePositions2.Add(first);
+
+            var collider = currentLine.GetComponent<PolygonCollider2D>();
+            collider.SetPath(0, linePositions2.ToArray());
+            var line_renderer = currentLine.GetComponent<LineRenderer>();
+            line_renderer.positionCount = linePositions3.Count;
+            line_renderer.SetPositions(linePositions3.ToArray());
+            lines.AddLast(currentLine);
+        }
+
+        currentLine = Instantiate(trackElement, new Vector3(), Quaternion.identity);
+        linePositions2.Clear();
+        linePositions3.Clear();
+    }
+
+    Vector3 getLineEndPoint(GameObject line, int index) {
+        var renderer = line.GetComponent<LineRenderer>();
+        return renderer.GetPosition(index >= 0 ? index + 1 : (renderer.positionCount - (-index + 1)));
+    }
+
     void updateLine()
     {
-        int numToRemove = 0;
-        for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < -0.2f; numToRemove++)
-            ;
-
-        linePositions2.RemoveRange(0, numToRemove);
-        linePositions3.RemoveRange(0, numToRemove);
-
-        if (linePositions2.Count > 0)
+        while (lines.Count != 0)
         {
-            linePositions2.RemoveRange(linePositions2.Count - 2, 2);
+            var line = lines.First.Value;
+            if (line.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLineEndPoint(lines.First.Value, -1)).x < -0.2f)
+            {
+                Destroy(line);
+                lines.RemoveFirst();
+            }
+            else
+            {
+                break;
+            }
         }
+
+        createNewLine();
 
         var endProgress = progress + numSegmentsInViewport;
         while (progress < endProgress)
@@ -212,9 +248,13 @@ public class SimpleTrackBuilder : MonoBehaviour
             bool forcedObstacle = progress >= nextObstacleProgressMax;
             if (randomChoiceObstacle || forcedObstacle)
             {
+                // New line when we create an obstacle
+                createNewLine();
                 addObstacle();
                 nextObstacleProgressMin = progress + minSegmentsBetweenObstacle;
                 nextObstacleProgressMax = progress + maxSegmentsBetweenObstacle;
+                // New line after we finish with the obstacle
+                createNewLine();
             }
             else
             {
@@ -224,25 +264,12 @@ public class SimpleTrackBuilder : MonoBehaviour
                 progress++;
             }
         }
-
-        Vector3 first = linePositions3[0];
-        Vector3 last = linePositions3[linePositions3.Count - 1];
-        last.y = -camHeight * 4;
-        linePositions2.Add(last);
-        first.y = -camHeight * 4;
-        linePositions2.Add(first);
-
-        var collider = line.GetComponent<PolygonCollider2D>();
-        collider.SetPath(0, linePositions2.ToArray());
-        var line_renderer = line.GetComponent<LineRenderer>();
-        line_renderer.positionCount = linePositions3.Count;
-        line_renderer.SetPositions(linePositions3.ToArray());
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
+        if (currentLine.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLineEndPoint(currentLine, -1)).x < 1.2f)
         {
             updateLine();
         }
