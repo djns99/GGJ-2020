@@ -177,7 +177,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 120
+  orthographic size: 80
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -251,7 +251,7 @@ MonoBehaviour:
   trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
     type: 3}
   segmentWidth: 1
-  minSegmentsBetweenObstacle: 500
+  minSegmentsBetweenObstacle: 50
   maxSegmentsBetweenObstacle: 10000
   cameraTrackMinPercent: 0.025
   cameraTrackMaxPercent: 0.4
