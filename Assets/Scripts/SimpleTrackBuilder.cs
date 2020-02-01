@@ -16,6 +16,7 @@ public class SimpleTrackBuilder : MonoBehaviour
     public float cameraTrackMinPercent = 0.025f;
     public float cameraTrackMaxPercent = 0.75f;
 
+    public float flatGapWidthPixels = 20.0f;
     public float gapWidthPixels = 20.0f;
     public float maxCliffHeightPixels = 20.0f;
     public float jumpCliffWidthPixels = 20.0f;
@@ -25,6 +26,13 @@ public class SimpleTrackBuilder : MonoBehaviour
     public float bumpyGroundWeight = 0.5f;
     public float spikePitDepthPixels = 20.0f;
     public float spikePitWidthPixels = 200.0f;
+    public float jumpPitWidthPixels = 100.0f;
+    public int jumpPitMidWidthSegments = 10;
+    public float pylonMaxHeight = 30.0f;
+    public int pylonWidthSegments = 10;
+
+    [HideInInspector]
+    public int numObstacles = 8;
 
     private int progress = 0;
     private int nextObstacleProgressMin;
@@ -307,7 +315,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         createNewLine();
 
         // Gap
-        float targetWidth = gapWidthPixels;
+        float targetWidth = flatGapWidthPixels;
         int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
         float realWidth = numSegments * segmentWidth;
         progress += numSegments;
@@ -469,6 +477,42 @@ public class SimpleTrackBuilder : MonoBehaviour
     //    }
     //}
 
+    void pylon() {
+        createNewLine();
+
+        var lastPos = linePositions3[0];
+        var pos = smoothIntoFlat(lastPos, getLinePointAtIndex(lines.Last.Value, -2));
+
+        createNewLine();
+
+        // Flat leading up to pylon
+        int numLeadIn = 10;
+        pos.x += numLeadIn * segmentWidth;
+        progress += numLeadIn;
+        addPointToLinePos(pos);
+
+        pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + pylonMaxHeight);
+        addPointToLinePos(pos);
+
+        pos.x += pylonWidthSegments * segmentWidth;
+        progress += pylonWidthSegments;
+        addPointToLinePos(pos);
+
+        // Flat leading up to pylon
+        int numTrailOff = 10;
+        pos.y = getNoise(progress + numTrailOff);
+        addPointToLinePos(pos);
+        pos.x += numTrailOff * segmentWidth;
+        progress += numTrailOff;
+        addPointToLinePos(pos);
+
+        createNewLine();
+
+        bezeirCurveBackToPerlin(pos);
+
+        createNewLine();
+    }
+
     void spikePit() {
         createNewLine();
 
@@ -529,10 +573,77 @@ public class SimpleTrackBuilder : MonoBehaviour
         bezeirCurveBackToPerlin(pos);
     }
 
+    void jumpPit() {
+
+        createNewLine();
+
+        var lastPos = linePositions3[0];
+        // Transition into a flat line
+        var pos = smoothIntoFlat(lastPos, getLinePointAtIndex(lines.Last.Value, -2));
+
+        // Start new line so we can retexture
+        createNewLine();
+
+        //TODO Do texturing etc
+        int numLeadIn = 10;
+        pos.x += segmentWidth * numLeadIn;
+        progress += numLeadIn;
+        addPointToLinePos(pos);
+
+        // End left half
+        createNewLine();
+
+        // Gap
+        int numSegments = Mathf.CeilToInt(jumpPitWidthPixels / segmentWidth);
+        int numPlatformUnits = (numSegments + jumpPitMidWidthSegments - 1) / jumpPitMidWidthSegments;
+        if (numSegments % 2 == 0)
+            numSegments++;
+
+        int halfSegments = (numPlatformUnits - 1) * jumpPitMidWidthSegments;
+        float halfWidth = halfSegments * segmentWidth;
+        progress += halfSegments;
+
+        // Clear automatically added link
+        linePositions2.Clear();
+        linePositions3.Clear();
+
+        pos.x += halfWidth;
+        pos.y = getNoise(progress);
+        addPointToLinePos(pos);
+
+        for (int i = 0; i < jumpPitMidWidthSegments; i++)
+        {
+            pos.x += segmentWidth;
+            addPointToLinePos(pos);
+        }
+
+        progress += jumpPitMidWidthSegments + halfSegments;
+        pos.x += halfWidth;
+
+        createNewLine();
+
+        // Clear automatically added link
+        linePositions2.Clear();
+        linePositions3.Clear();
+
+        int numTrailOff = 10;
+        pos.y = getNoise(progress + numTrailOff);
+        addPointToLinePos(pos);
+        pos.x += segmentWidth * numTrailOff;
+        progress += numTrailOff;
+        addPointToLinePos(pos);
+
+        // End obstalce
+        createNewLine();
+
+        // Ease back into normal oepration
+        bezeirCurveBackToPerlin(pos);
+
+        createNewLine();
+    }
+
     void addObstacle()
     {
-
-        int numObstacles = 6;
         int objectId = Random.Range(0, numObstacles);
         switch (objectId)
         {
@@ -543,16 +654,22 @@ public class SimpleTrackBuilder : MonoBehaviour
                 gap();
                 return;
             case 2:
-                cliffUp();
+                cliffDown();
                 return;
             case 3:
-                cliffDown();
+                cliffUp();
                 return;
             case 4:
                 jumpCliff();
                 return;
             case 5:
+                pylon();
+                return;
+            case 6:
                 spikePit();
+                return;
+            case 7:
+                jumpPit();
                 return;
         }
     }
