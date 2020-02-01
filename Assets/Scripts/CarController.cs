@@ -51,7 +51,7 @@ public class CarController : MonoBehaviour
     {
         if (carBody.velocity.magnitude <= 10f)
         {
-            carBody.AddForce(transform.right * 10000);
+            carBody.AddForce(transform.right * 15000);
             foreach (WheelJoint2D wheelJoint in carBody.GetComponents<WheelJoint2D>())
             {
                 JointMotor2D motor = wheelJoint.motor;
@@ -86,7 +86,7 @@ public class CarController : MonoBehaviour
             isExploding = true;
         }
 
-        if (carBody.velocity.magnitude <= 0.7f)
+        if (carBody.velocity.magnitude <= 0.8f)
         {
             carStoppingCounter += Time.deltaTime;
             if (carStoppingCounter >= 2f)
@@ -112,7 +112,7 @@ public class CarController : MonoBehaviour
         List<Transform> wheels = carPieces.FindAll(element => (element.name.Contains("Front") || element.name.Contains("Back")));
         foreach (Transform wheel in wheels)
         {
-            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 20f)
+            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 10f)
             {
                 Debug.Log("wheel extended");
                 isExploding = true;

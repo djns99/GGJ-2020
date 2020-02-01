@@ -5,12 +5,13 @@ using UnityEngine;
 public class SoundManager : MonoBehaviour
 {
     public static AudioClip sound;
-
     private AudioSource source;
+
 
     private void Start()
     {
         source = GetComponent<AudioSource>();
+
     }
 
     // Update is called once per frame
@@ -18,7 +19,7 @@ public class SoundManager : MonoBehaviour
     {
         if (sound != null)
         {
-            source.PlayOneShot(sound, 0.2f);
+            source.PlayOneShot(sound, 0.7f);
             sound = null;
         }
     }
