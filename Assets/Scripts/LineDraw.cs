@@ -50,7 +50,7 @@ public class LineDraw : MonoBehaviour
         if ( Input.GetMouseButton( 0 ) )
         {
             var finger_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if( Vector2.Distance( finger_pos, line_points[line_points.Count - 1 ]) > 2f)
+            if( Vector2.Distance( finger_pos, line_points[line_points.Count - 1 ]) > 4f)
             {
                 line_points.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 line_renderer.positionCount++;

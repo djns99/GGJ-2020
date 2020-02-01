@@ -15,7 +15,7 @@ public class CarController : MonoBehaviour
     private List<Transform> carPieces;
     private List<Vector3> compDirections;
 
-    private float originalSpeed = -2000f;
+    private float originalSpeed = -2500f;
 
     public float carStoppingCounter;
 
@@ -34,6 +34,14 @@ public class CarController : MonoBehaviour
         {
             carPieces.Add(child);
             compDirections.Add(child.position);
+        }
+
+        // Spawn car on line
+        RaycastHit2D hit = Physics2D.Raycast(carBody.transform.position, Vector3.down);
+        if (hit.collider != null)
+        {
+            
+            print("Hit: " + hit.collider.gameObject.name);
         }
     }
 
@@ -112,7 +120,7 @@ public class CarController : MonoBehaviour
         List<Transform> wheels = carPieces.FindAll(element => (element.name.Contains("Front") || element.name.Contains("Back")));
         foreach (Transform wheel in wheels)
         {
-            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 10f)
+            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 8f)
             {
                 Debug.Log("wheel extended");
                 isExploding = true;
