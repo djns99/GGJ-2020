@@ -17,11 +17,6 @@ public class StartScreen : MonoBehaviour
         }
     }
 
-    public void UserName()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-    }
-
     public void PlayGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
