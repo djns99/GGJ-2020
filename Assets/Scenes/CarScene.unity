@@ -235,7 +235,6 @@ Transform:
   - {fileID: 1741671112}
   - {fileID: 1723363532}
   - {fileID: 26664850}
-  - {fileID: 2049732211}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -902,6 +901,7 @@ Transform:
   - {fileID: 950572487}
   - {fileID: 1038537116}
   - {fileID: 1539434124}
+  - {fileID: 2049732211}
   m_Father: {fileID: 408819205}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1145,6 +1145,10 @@ MonoBehaviour:
   segmentWidth: 1
   minSegmentsBetweenObstacle: 500
   maxSegmentsBetweenObstacle: 10000
+  cameraTrackMinPercent: 0.025
+  cameraTrackMaxPercent: 0.75
+  targetGapWidthPixels: 20
+  maxCliffHeightPixels: 20
 --- !u!1 &2049732208
 GameObject:
   m_ObjectHideFlags: 0
@@ -1157,12 +1161,12 @@ GameObject:
   - component: {fileID: 2049732210}
   - component: {fileID: 2049732209}
   m_Layer: 0
-  m_Name: Particle System
+  m_Name: Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!199 &2049732209
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -1182,7 +1186,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 3d74a9565439ed149818617e97777920, type: 2}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -1235,13 +1239,13 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2049732208}
   serializedVersion: 6
-  lengthInSec: 1
+  lengthInSec: 2
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 1
   useUnscaledTime: 0
@@ -1363,7 +1367,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4
+      scalar: 6
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -1801,7 +1805,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4
+      scalar: 3
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -1999,7 +2003,7 @@ ParticleSystem:
           m_RotationOrder: 4
     arc:
       value: 360
-      mode: 0
+      mode: 3
       spread: 0
       speed:
         serializedVersion: 2
@@ -2614,7 +2618,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
   UVModule:
     serializedVersion: 2
-    enabled: 0
+    enabled: 1
     mode: 0
     timeMode: 0
     fps: 30
@@ -2726,8 +2730,8 @@ ParticleSystem:
         m_RotationOrder: 4
     speedRange: {x: 0, y: 1}
     tilesX: 1
-    tilesY: 1
-    animationType: 0
+    tilesY: 4
+    animationType: 1
     rowIndex: 0
     cycles: 1
     uvChannelMask: -1
@@ -5954,8 +5958,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children: []
-  m_Father: {fileID: 408819205}
-  m_RootOrder: 3
+  m_Father: {fileID: 1741671112}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2138652900
 GameObject:
