@@ -30,9 +30,10 @@ public class SimpleTrackBuilder : MonoBehaviour
     public int jumpPitMidWidthSegments = 10;
     public float pylonMaxHeight = 30.0f;
     public int pylonWidthSegments = 10;
+    public float pylonPitMaxHeight = 30.0f;
+    public float pylonPitWidthPixels = 60.0f;
 
-    [HideInInspector]
-    public int numObstacles = 8;
+    public int numObstacles = 9;
 
     private int progress = 0;
     private int nextObstacleProgressMin;
@@ -82,7 +83,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         return Mathf.Pow(1f - t, 3f) * p0 + 3f * Mathf.Pow(1f - t, 2f) * t * p1 + 3f * (1f - t) * Mathf.Pow(t, 2f) * p2 + Mathf.Pow(t, 3f) * p3;
     }
 
-    void createNewLine() {
+    void createNewLine(bool linkPrevious = true) {
         if (linePositions3.Count > 1)
         {
             var line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
@@ -108,7 +109,8 @@ public class SimpleTrackBuilder : MonoBehaviour
             linePositions2.Clear();
             linePositions3.Clear();
 
-            addPointToLinePos(lastCopy);
+            if(linkPrevious)
+                addPointToLinePos(lastCopy);
         }
     }
 
@@ -119,7 +121,7 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     void addPerlinPoint() {
         // Continue with noise
-        var next = new Vector3(progress * segmentWidth - camWidth, getNoise(progress), 0.0f);
+        var next = new Vector3(progress * segmentWidth, getNoise(progress), 0.0f);
         addPointToLinePos(next);
         progress++;
     }
@@ -179,15 +181,26 @@ public class SimpleTrackBuilder : MonoBehaviour
 
         createNewLine();
 
-        updateLine();
-        updateLine();
+        int segmentsInCam = Mathf.CeilToInt(camWidth / segmentWidth);
+        Vector3 pos = new Vector3(-segmentsInCam * segmentWidth, trackAllowedRangeMin, 0);
+        addPointToLinePos(pos);
+        pos.x = segmentsInCam * segmentWidth;
+        addPointToLinePos(pos);
+        progress = segmentsInCam;
+
+        createNewLine();
+
+        bezeirCurveBackToPerlin(pos, 100);
+
+        createNewLine();
+
         updateLine();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 1.2f)
+        if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 3f)
         {
             updateLine();
         }
@@ -216,13 +229,14 @@ public class SimpleTrackBuilder : MonoBehaviour
     {
         // Return to normal
         int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
+        int controlLength = tailWidth / 5;
         progress += tailNumSegments;
         var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
         var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
-        targetControl = target + (targetControl - target).normalized * 10;
+        targetControl = target + (targetControl - target).normalized * controlLength;
         var start = pos;
         var startControl = new Vector3(pos.x + segmentWidth, pos.y);
-        startControl = start + (startControl - start).normalized * 10;
+        startControl = start + (startControl - start).normalized * controlLength;
 
         for (int i = 0; i < tailNumSegments; i++)
         {
@@ -265,17 +279,13 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine();
+        createNewLine(false);
 
         // Gap
         float targetWidth = gapWidthPixels;
         int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
         float realWidth = numSegments * segmentWidth;
         progress += numSegments;
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
 
         pos.x += realWidth;
         int numTrailOff = 25;
@@ -312,7 +322,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine();
+        createNewLine(false);
 
         // Gap
         float targetWidth = flatGapWidthPixels;
@@ -320,9 +330,6 @@ public class SimpleTrackBuilder : MonoBehaviour
         float realWidth = numSegments * segmentWidth;
         progress += numSegments;
 
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
 
         pos.x += realWidth;
         int numTrailOff = 25;
@@ -356,17 +363,13 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine();
+        createNewLine(false);
 
         // Gap
         float targetWidth = gapWidthPixels;
         int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
         float realWidth = numSegments * segmentWidth;
         progress += numSegments;
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
 
         // Set cliff position
         pos.x += realWidth;
@@ -400,11 +403,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine();
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
+        createNewLine(false);
 
         // Cliff
         pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
@@ -434,11 +433,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine();
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
+        createNewLine(false);
 
         // Cliff
         pos.y = Mathf.Max(trackAllowedRangeMin, pos.y - maxCliffHeightPixels);
@@ -491,6 +486,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
+        createNewLine(false);
+
         pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + pylonMaxHeight);
         addPointToLinePos(pos);
 
@@ -498,7 +495,62 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += pylonWidthSegments;
         addPointToLinePos(pos);
 
+        createNewLine(false);
+
+        // Flat leading away from pylon
+        int numTrailOff = 10;
+        pos.y = getNoise(progress + numTrailOff);
+        addPointToLinePos(pos);
+        pos.x += numTrailOff * segmentWidth;
+        progress += numTrailOff;
+        addPointToLinePos(pos);
+
+        createNewLine();
+
+        bezeirCurveBackToPerlin(pos);
+
+        createNewLine();
+    }
+
+    void pylonPit()
+    {
+        createNewLine();
+
+        var lastPos = linePositions3[0];
+        var pos = smoothIntoFlat(lastPos, getLinePointAtIndex(lines.Last.Value, -2));
+
+        createNewLine();
+
         // Flat leading up to pylon
+        int numLeadIn = 10;
+        pos.x += numLeadIn * segmentWidth;
+        progress += numLeadIn;
+        addPointToLinePos(pos);
+
+        createNewLine(false);
+
+        pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + pylonMaxHeight);
+        addPointToLinePos(pos);
+
+        pos.x += pylonWidthSegments * segmentWidth;
+        progress += pylonWidthSegments;
+        addPointToLinePos(pos);
+
+        createNewLine(false);
+
+        // Skip pit
+        int pitWidthSgements = Mathf.CeilToInt(pylonPitWidthPixels / segmentWidth);
+        pos.x += pitWidthSgements * segmentWidth;
+        addPointToLinePos(pos);
+        progress += pitWidthSgements;
+
+        // Make second pylon
+        pos.x += pylonWidthSegments * segmentWidth;
+        progress += pylonWidthSegments;
+        addPointToLinePos(pos);
+
+        createNewLine(false);
+        // Flat leading away from pylon
         int numTrailOff = 10;
         pos.y = getNoise(progress + numTrailOff);
         addPointToLinePos(pos);
@@ -527,11 +579,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine();
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
+        createNewLine(false);
 
         // Pit start
         var originalY = pos.y;
@@ -553,11 +601,7 @@ public class SimpleTrackBuilder : MonoBehaviour
             progress++;
         }
 
-        createNewLine();
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
+        createNewLine(false);
 
         // Cliff
         pos.y = originalY;
@@ -591,7 +635,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine();
+        createNewLine(false);
 
         // Gap
         int numSegments = Mathf.CeilToInt(jumpPitWidthPixels / segmentWidth);
@@ -602,10 +646,6 @@ public class SimpleTrackBuilder : MonoBehaviour
         int halfSegments = (numPlatformUnits - 1) * jumpPitMidWidthSegments;
         float halfWidth = halfSegments * segmentWidth;
         progress += halfSegments;
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
 
         pos.x += halfWidth;
         pos.y = getNoise(progress);
@@ -620,11 +660,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += jumpPitMidWidthSegments + halfSegments;
         pos.x += halfWidth;
 
-        createNewLine();
-
-        // Clear automatically added link
-        linePositions2.Clear();
-        linePositions3.Clear();
+        createNewLine(false);
 
         int numTrailOff = 10;
         pos.y = getNoise(progress + numTrailOff);
@@ -663,12 +699,15 @@ public class SimpleTrackBuilder : MonoBehaviour
                 jumpCliff();
                 return;
             case 5:
-                pylon();
-                return;
-            case 6:
                 spikePit();
                 return;
+            case 6:
+                pylon();
+                return;
             case 7:
+                pylonPit();
+                return;
+            case 8:
                 jumpPit();
                 return;
         }
