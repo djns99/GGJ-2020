@@ -33,6 +33,7 @@ public class SimpleTrackBuilder : MonoBehaviour
     private float trackAllowedRangeMin;
     private float trackAllowedRangeMax;
 
+
     Camera cam;
     float camHeight;
     float camWidth;
@@ -49,8 +50,10 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     void addPointToLinePos(Vector3 vec)
     {
-        linePositions2.Add(vec);
+        vec.z = -1;
         linePositions3.Add(vec);
+        vec.y += trackElement.GetComponent<LineRenderer>().startWidth / 2;
+        linePositions2.Add(vec);
     }
 
     float getSlerpHeight(float start, float end, float progress)
@@ -397,28 +400,28 @@ public class SimpleTrackBuilder : MonoBehaviour
         bezeirCurveBackToPerlin(pos);
     }
 
-    void bumpyGround()
-    {
-        var numSegments = Mathf.CeilToInt(bumpyGroundLength / segmentWidth);
-        int segmentsDampening = 20;
-        for (int i = 0; i < numSegments + segmentsDampening * 2; i++)
-        {
-            // Continue with noise
-            var noise1 = getNoise(progress);
-            var noise2 = getNoise(progress, bumpyGroundNoise) * bumpyGroundWeight;
-            if (i < segmentsDampening)
-            {
-                noise2 *= (float)i / segmentsDampening;
-            }
-            else if(i >= numSegments + segmentsDampening)
-            {
-                noise2 *= 1.0f - (float)(i - numSegments - segmentsDampening) / segmentsDampening;
-            }
-            var next = new Vector3(progress * segmentWidth - camWidth, noise1 + noise2, 0.0f);
-            addPointToLinePos(next);
-            progress++;
-        }
-    }
+    //void bumpyGround()
+    //{
+    //    var numSegments = Mathf.CeilToInt(bumpyGroundLength / segmentWidth);
+    //    int segmentsDampening = 20;
+    //    for (int i = 0; i < numSegments + segmentsDampening * 2; i++)
+    //    {
+    //        // Continue with noise
+    //        var noise1 = getNoise(progress);
+    //        var noise2 = getNoise(progress, bumpyGroundNoise) * bumpyGroundWeight;
+    //        if (i < segmentsDampening)
+    //        {
+    //            noise2 *= (float)i / segmentsDampening;
+    //        }
+    //        else if(i >= numSegments + segmentsDampening)
+    //        {
+    //            noise2 *= 1.0f - (float)(i - numSegments - segmentsDampening) / segmentsDampening;
+    //        }
+    //        var next = new Vector3(progress * segmentWidth - camWidth, noise1 + noise2, 0.0f);
+    //        addPointToLinePos(next);
+    //        progress++;
+    //    }
+    //}
 
     void spikePit() {
         createNewLine();
