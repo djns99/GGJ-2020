@@ -19,6 +19,7 @@ public class StartScreen : MonoBehaviour
 
     public void PlayGame()
     {
+        GameManager.Instance.AssignPlayer();
         SceneManager.LoadScene(2);
     }
 

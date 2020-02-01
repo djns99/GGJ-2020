@@ -17,8 +17,6 @@ public class ScoreDisplay : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            Debug.Log(GetComponent<TextMeshProUGUI>());
-            Debug.Log(GameManager.Instance.score.ToString());
             GetComponent<TextMeshProUGUI>().text = GameManager.Instance.score.ToString();
         }
     }
