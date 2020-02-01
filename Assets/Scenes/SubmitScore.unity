@@ -405,7 +405,18 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 621689209}
+        m_MethodName: PlayGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -681,6 +692,7 @@ GameObject:
   m_Component:
   - component: {fileID: 621689208}
   - component: {fileID: 621689209}
+  - component: {fileID: 621689210}
   m_Layer: 0
   m_Name: userProfile
   m_TagString: Untagged
@@ -715,6 +727,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b48315080450e814ea7b30e1ac7ea87b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &621689210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 621689207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4af8fbabcbd96244a8853ffdc29a25d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player_name: 
+  score: 0
 --- !u!1 &633706325
 GameObject:
   m_ObjectHideFlags: 0
@@ -995,7 +1021,7 @@ MonoBehaviour:
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
-    m_RichText: 1
+    m_RichText: 0
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
