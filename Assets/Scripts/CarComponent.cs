@@ -5,6 +5,8 @@ using UnityEngine;
 public class CarComponent : MonoBehaviour
 {
     public bool CollideWithGround { get; set; }
+    public bool IsOutOfScreen { get; set; }
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -20,5 +22,10 @@ public class CarComponent : MonoBehaviour
         {
             CollideWithGround = false;
         }
+    }
+
+    public void OnBecameInvisible()
+    {
+        IsOutOfScreen = true;
     }
 }
