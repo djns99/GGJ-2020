@@ -12,6 +12,11 @@ public class SimpleTrackBuilder : MonoBehaviour
     public int minSegmentsBetweenObstacle = 500;
     public int maxSegmentsBetweenObstacle = 10000;
     private int numSegmentsInViewport;
+    public float cameraTrackMinPercent = 0.025f;
+    public float cameraTrackMaxPercent = 0.75f;
+
+    public float targetGapWidthPixels = 20.0f;
+    public float maxCliffHeightPixels = 20.0f;
 
     private int progress = 0;
     private int nextObstacleProgressMin;
@@ -45,8 +50,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         camWidth = camHeight * cam.aspect;
         numSegmentsInViewport = Mathf.CeilToInt(camWidth / segmentWidth);
 
-        trackAllowedRangeMin = -(camHeight / 2.0f) * 0.95f;
-        trackAllowedRangeMax = (camHeight / 2.0f) * 0.5f;
+        trackAllowedRangeMin = camHeight * cameraTrackMinPercent - camHeight / 2;
+        trackAllowedRangeMax = camHeight * cameraTrackMaxPercent - camHeight / 2;
 
         nextObstacleProgressMin = minSegmentsBetweenObstacle;
         nextObstacleProgressMax = maxSegmentsBetweenObstacle;
@@ -90,7 +95,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         switch (objectId) {
             case 0:
                 {
-                    int targetWidth = 50;
+                    float targetWidth = targetGapWidthPixels;
                     int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
                     float realWidth = numSegments * segmentWidth;
                     progress += numSegments;
@@ -110,8 +115,6 @@ public class SimpleTrackBuilder : MonoBehaviour
                 {
                     
 
-                    float maxHeight = trackAllowedRangeMax;
-                    float maxJump = 20f;
 
                     int headWidth = 10;
                     int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
@@ -131,7 +134,7 @@ public class SimpleTrackBuilder : MonoBehaviour
                     int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
                     progress += tailNumSegments;
 
-                    pos.y = Mathf.Min(maxHeight, pos.y + maxJump);
+                    pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
                     addPointToLinePos(pos);
                     var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
                     var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
