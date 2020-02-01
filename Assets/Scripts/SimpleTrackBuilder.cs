@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SimpleTrackBuilder : MonoBehaviour
 {
@@ -176,6 +177,12 @@ public class SimpleTrackBuilder : MonoBehaviour
         if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 1.2f)
         {
             updateLine();
+        }
+
+        // Spawn car
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            SceneManager.LoadScene("CarScene");
         }
     }
 
