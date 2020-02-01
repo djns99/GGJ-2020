@@ -90,7 +90,7 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     void addObstacle()
     {
-        int numObstacles = 2;
+        int numObstacles = 3;
         int objectId = Random.Range(0, numObstacles);
         switch (objectId) {
             case 0:
@@ -100,22 +100,23 @@ public class SimpleTrackBuilder : MonoBehaviour
                     float realWidth = numSegments * segmentWidth;
                     progress += numSegments;
 
+                    // Drop off bottom of screen
                     var pos = linePositions3[linePositions3.Count - 1];
                     pos.y = -camHeight;
                     addPointToLinePos(pos);
 
+                    // Skip to other side
                     pos.x += realWidth;
                     addPointToLinePos(pos);
 
+                    // Come back up the other side
                     pos.y = getNoise(progress - 1);
                     addPointToLinePos(pos);
                     return;
                 }
             case 1:
                 {
-                    
-
-
+                    // Flat leading up to cliff
                     int headWidth = 10;
                     int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
                     progress += headNumSegments;
@@ -130,12 +131,14 @@ public class SimpleTrackBuilder : MonoBehaviour
                         addPointToLinePos(pos);
                     }
 
+                    // Cliff
+                    pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
+                    addPointToLinePos(pos);
+
+                    // Return to normal
                     int tailWidth = 50;
                     int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
                     progress += tailNumSegments;
-
-                    pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
-                    addPointToLinePos(pos);
                     var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
                     var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
                     var start = pos;
@@ -148,7 +151,41 @@ public class SimpleTrackBuilder : MonoBehaviour
                     }
                 }
                 return;
+            case 2:
+                {
+                    // Cliff
+                    var pos = linePositions3[linePositions3.Count - 1];
+                    pos.y = Mathf.Max(trackAllowedRangeMin, pos.y - maxCliffHeightPixels);
+                    addPointToLinePos(pos);
 
+                    // Flat at bottom of cliff
+                    int headWidth = 50;
+                    int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
+                    progress += headNumSegments;
+
+                    for (int i = 0; i < headNumSegments; i++)
+                    {
+                        pos.x += segmentWidth;
+                        addPointToLinePos(pos);
+                    }
+
+                    // Return to normal
+                    int tailWidth = 50;
+                    int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
+                    progress += tailNumSegments;
+                    var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
+                    var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
+                    var start = pos;
+                    var startControl = new Vector3(pos.x + segmentWidth, pos.y);
+
+                    for (int i = 0; i < tailNumSegments; i++)
+                    {
+                        pos.y = getBezierPos(start, startControl, target, targetControl, (float)i / tailNumSegments).y;
+                        pos.x += segmentWidth;
+                        addPointToLinePos(pos);
+                    }
+                }
+                return;
         }
     }
 
@@ -169,8 +206,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         var endProgress = progress + numSegmentsInViewport;
         while (progress < endProgress)
         {
-            var randomness = Random.Range(0, 1);
-            var threshold = 1.0f;// 1.0f / (maxSegmentsBetweenObstacle - minSegmentsBetweenObstacle);
+            var randomness = Random.Range(0.0f, 1.0f);
+            var threshold = 1.0f / (maxSegmentsBetweenObstacle - minSegmentsBetweenObstacle);
             bool randomChoiceObstacle = progress >= nextObstacleProgressMin && randomness < threshold;
             bool forcedObstacle = progress >= nextObstacleProgressMax;
             if (randomChoiceObstacle || forcedObstacle)
