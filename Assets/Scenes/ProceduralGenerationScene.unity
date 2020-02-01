@@ -237,6 +237,7 @@ MonoBehaviour:
   maxSegmentsBetweenObstacle: 500
   cameraTrackMinPercent: 0.025
   cameraTrackMaxPercent: 0.4
+  flatGapWidthPixels: 20
   gapWidthPixels: 20
   maxCliffHeightPixels: 20
   jumpCliffWidthPixels: 20
@@ -244,6 +245,10 @@ MonoBehaviour:
   bumpyGroundLength: 100
   bumpyGroundNoise: 0.1
   bumpyGroundWeight: 0.1
+  spikePitDepthPixels: 20
+  spikePitWidthPixels: 200
+  jumpPitWidthPixels: 200
+  jumpPitMidWidthSegments: 40
 --- !u!1 &878559929
 GameObject:
   m_ObjectHideFlags: 0

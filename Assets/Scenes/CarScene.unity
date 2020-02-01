@@ -1490,8 +1490,8 @@ MonoBehaviour:
   trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
     type: 3}
   segmentWidth: 1
-  minSegmentsBetweenObstacle: 30
-  maxSegmentsBetweenObstacle: 50
+  minSegmentsBetweenObstacle: 0
+  maxSegmentsBetweenObstacle: 15
   cameraTrackMinPercent: 0.1
   cameraTrackMaxPercent: 0.6
   gapWidthPixels: 20
