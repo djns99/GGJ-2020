@@ -5,6 +5,18 @@ using UnityEngine.SceneManagement;
 
 public class StartScreen : MonoBehaviour
 {
+    private float delayBeforeLoading = 5f;
+    private float timeElapsed;
+
+    private void Update()
+    {
+        timeElapsed += Time.deltaTime;
+
+        if (timeElapsed > delayBeforeLoading && (SceneManager.GetActiveScene().buildIndex) == 0) {
+            SceneManager.LoadScene(1);
+        }
+    }
+
     public void UserName()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
