@@ -233,11 +233,11 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 100
+  m_Mass: 50
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 7
-  m_Material: {fileID: 0}
+  m_GravityScale: 10
+  m_Material: {fileID: 6200000, guid: 367425af4af397c4da132dcc711f2629, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -266,7 +266,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 26664847}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.703, y: -0.492, z: 0}
+  m_LocalPosition: {x: -0.83, y: -0.492, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2138652901}
@@ -845,7 +845,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1723363531}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.486, y: -0.48700005, z: 0}
+  m_LocalPosition: {x: 0.531, y: -0.48700005, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1045033959}
@@ -864,11 +864,11 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 100
+  m_Mass: 50
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 7
-  m_Material: {fileID: 0}
+  m_GravityScale: 10
+  m_Material: {fileID: 6200000, guid: 367425af4af397c4da132dcc711f2629, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -913,8 +913,8 @@ GameObject:
   - component: {fileID: 1741671110}
   - component: {fileID: 1741671113}
   - component: {fileID: 1741671111}
-  - component: {fileID: 1741671114}
   - component: {fileID: 1741671115}
+  - component: {fileID: 1741671114}
   m_Layer: 0
   m_Name: Body
   m_TagString: Player
@@ -934,15 +934,15 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
-  m_Mass: 31.329563
+  m_Mass: 27.192612
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 5
+  m_GravityScale: 10
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 4
+  m_Constraints: 0
 --- !u!235 &1741671111
 WheelJoint2D:
   m_ObjectHideFlags: 0
@@ -957,7 +957,7 @@ WheelJoint2D:
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_AutoConfigureConnectedAnchor: 1
-  m_Anchor: {x: 0.47844705, y: -0.20162438}
+  m_Anchor: {x: 0.51135844, y: -0.16495103}
   m_ConnectedAnchor: {x: 0, y: 0}
   m_Suspension:
     m_DampingRatio: 0.7
@@ -966,7 +966,7 @@ WheelJoint2D:
   m_UseMotor: 1
   m_Motor:
     m_MotorSpeed: -3000
-    m_MaximumMotorForce: 1000000
+    m_MaximumMotorForce: 10000
 --- !u!4 &1741671112
 Transform:
   m_ObjectHideFlags: 0
@@ -1001,7 +1001,7 @@ WheelJoint2D:
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_AutoConfigureConnectedAnchor: 1
-  m_Anchor: {x: -0.6928964, y: -0.20118016}
+  m_Anchor: {x: -0.8655909, y: -0.24381636}
   m_ConnectedAnchor: {x: 0, y: 0}
   m_Suspension:
     m_DampingRatio: 0.7
@@ -1010,7 +1010,7 @@ WheelJoint2D:
   m_UseMotor: 1
   m_Motor:
     m_MotorSpeed: -3000
-    m_MaximumMotorForce: 1000000
+    m_MaximumMotorForce: 10000
 --- !u!60 &1741671114
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1036,33 +1036,13 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.73648417, y: 0.006128979}
-      - {x: 0.38218167, y: 0.3362401}
-      - {x: -0.48876968, y: 0.37045214}
-      - {x: -0.5803328, y: 0.3545885}
-      - {x: -0.7302448, y: 0.31967258}
-      - {x: -0.92737144, y: 0.19063139}
-      - {x: -1.007315, y: -0.010018158}
-      - {x: -1.0937388, y: -0.2140348}
-      - {x: -1.0441895, y: -0.42656228}
-      - {x: -0.9847061, y: -0.42322364}
-      - {x: -0.89336437, y: -0.24626656}
-      - {x: -0.7528269, y: -0.22508755}
-      - {x: -0.59662265, y: -0.2244101}
-      - {x: -0.5231859, y: -0.27024308}
-      - {x: -0.45042476, y: -0.39390108}
-      - {x: -0.44847924, y: -0.488451}
-      - {x: 0.18285792, y: -0.47765476}
-      - {x: 0.2550325, y: -0.27519757}
-      - {x: 0.3885531, y: -0.20310679}
-      - {x: 0.51312864, y: -0.1929783}
-      - {x: 0.62883085, y: -0.21641193}
-      - {x: 0.6994578, y: -0.29173216}
-      - {x: 0.74353147, y: -0.39962626}
-      - {x: 0.9818282, y: -0.39478332}
-      - {x: 1.090597, y: -0.33437482}
-      - {x: 1.1113771, y: -0.13613692}
-      - {x: 0.9607019, y: -0.02746029}
+    - - {x: -0.76030713, y: 0.33411017}
+      - {x: -1.2889708, y: -0.55067676}
+      - {x: -0.8819745, y: -0.21241513}
+      - {x: -0.14516868, y: -0.5009254}
+      - {x: 0.47693783, y: -0.1920414}
+      - {x: 0.9803621, y: -0.3965629}
+      - {x: 0.45412374, y: 0.30404788}
 --- !u!114 &1741671115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1226,11 +1206,13 @@ MonoBehaviour:
     type: 3}
   segmentWidth: 1
   minSegmentsBetweenObstacle: 30
-  maxSegmentsBetweenObstacle: 500
-  cameraTrackMinPercent: 0.05
-  cameraTrackMaxPercent: 0.5
-  targetGapWidthPixels: 20
+  maxSegmentsBetweenObstacle: 200
+  cameraTrackMinPercent: 0.1
+  cameraTrackMaxPercent: 0.6
+  gapWidthPixels: 20
   maxCliffHeightPixels: 10
+  jumpCliffWidthPixels: 20
+  jumpCliffMaxHeightPixels: 20
 --- !u!1 &2049732208
 GameObject:
   m_ObjectHideFlags: 0
