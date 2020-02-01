@@ -474,7 +474,7 @@ MonoBehaviour:
   isExploding: 0
   carStoppingCounter: 0
   prevSpeed: 0
-  crashingSound: {fileID: 8300000, guid: 9dbed06a4599f2f4e8e3ff46ed5ed00c, type: 3}
+  crashingSound: {fileID: 8300000, guid: e787d0f4dddcfa5408868c95d7c46cb1, type: 3}
 --- !u!1 &551323636
 GameObject:
   m_ObjectHideFlags: 0
