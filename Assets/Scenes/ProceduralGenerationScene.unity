@@ -241,6 +241,9 @@ MonoBehaviour:
   maxCliffHeightPixels: 20
   jumpCliffWidthPixels: 20
   jumpCliffMaxHeightPixels: 20
+  bumpyGroundLength: 100
+  bumpyGroundNoise: 0.1
+  bumpyGroundWeight: 0.1
 --- !u!1 &878559929
 GameObject:
   m_ObjectHideFlags: 0
