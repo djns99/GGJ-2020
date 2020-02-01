@@ -233,8 +233,8 @@ MonoBehaviour:
   trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
     type: 3}
   segmentWidth: 1
-  minSegmentsBetweenObstacle: 50
-  maxSegmentsBetweenObstacle: 500
+  minSegmentsBetweenObstacle: 1
+  maxSegmentsBetweenObstacle: 1
   cameraTrackMinPercent: 0.025
   cameraTrackMaxPercent: 0.4
   flatGapWidthPixels: 20
@@ -249,6 +249,11 @@ MonoBehaviour:
   spikePitWidthPixels: 200
   jumpPitWidthPixels: 200
   jumpPitMidWidthSegments: 40
+  pylonMaxHeight: 40
+  pylonWidthSegments: 10
+  pylonPitMaxHeight: 30
+  pylonPitWidthPixels: 30
+  numObstacles: 9
 --- !u!1 &878559929
 GameObject:
   m_ObjectHideFlags: 0
