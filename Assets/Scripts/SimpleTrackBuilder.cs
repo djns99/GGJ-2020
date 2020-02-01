@@ -23,6 +23,8 @@ public class SimpleTrackBuilder : MonoBehaviour
     public float bumpyGroundLength = 100.0f;
     public float bumpyGroundNoise = 0.5f;
     public float bumpyGroundWeight = 0.5f;
+    public float spikePitDepthPixels = 20.0f;
+    public float spikePitWidthPixels = 200.0f;
 
     private int progress = 0;
     private int nextObstacleProgressMin;
@@ -418,9 +420,68 @@ public class SimpleTrackBuilder : MonoBehaviour
         }
     }
 
+    void spikePit() {
+        createNewLine();
+
+        var lastPos = linePositions3[0];
+        var pos = smoothIntoFlat(lastPos, getLinePointAtIndex(lines.Last.Value, -2));
+
+        createNewLine();
+
+        // Flat leading up to cliff
+        int numLeadIn = 10;
+        pos.x += numLeadIn * segmentWidth;
+        progress += numLeadIn;
+        addPointToLinePos(pos);
+
+        createNewLine();
+
+        // Clear automatically added link
+        linePositions2.Clear();
+        linePositions3.Clear();
+
+        // Pit start
+        var originalY = pos.y;
+        pos.y = Mathf.Max(trackAllowedRangeMin, pos.y - spikePitDepthPixels);
+        addPointToLinePos(pos);
+
+        int spikePitSegments = Mathf.CeilToInt(spikePitWidthPixels / segmentWidth);
+        // Make sure multiple 4 number of spikes
+        spikePitSegments += 4 - spikePitSegments % 4;
+        float spikeSum = (originalY - pos.y) * 0.2f;
+        for (int i = 0; i < spikePitSegments; i++) {
+            pos.x += segmentWidth;
+            pos.y += spikeSum;
+            if (i % 2 == 1)
+            {
+                spikeSum *= -1;
+            }
+            addPointToLinePos(pos);
+            progress++;
+        }
+
+        createNewLine();
+
+        // Clear automatically added link
+        linePositions2.Clear();
+        linePositions3.Clear();
+
+        // Cliff
+        pos.y = originalY;
+        addPointToLinePos(pos);
+
+        int numTrailOff = 10;
+        pos.x += segmentWidth * numTrailOff;
+        progress += numTrailOff;
+        addPointToLinePos(pos);
+
+        createNewLine();
+
+        bezeirCurveBackToPerlin(pos);
+    }
+
     void addObstacle()
     {
-        var lastPos = getLinePointAtIndex(lines.Last.Value, -1);
 
         int numObstacles = 5;
         int objectId = Random.Range(0, numObstacles);
@@ -439,8 +500,7 @@ public class SimpleTrackBuilder : MonoBehaviour
                 jumpCliff();
                 return;
             case 4:
-                // TODO
-                gap();
+                spikePit();
                 //bumpyGround();
                 return;
         }
