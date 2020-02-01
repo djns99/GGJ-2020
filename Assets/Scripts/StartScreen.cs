@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class StartScreen : MonoBehaviour
 {
-    private float delayBeforeLoading = 5f;
+    private float delayBeforeLoading = 2f;
     private float timeElapsed;
 
     private void Update()

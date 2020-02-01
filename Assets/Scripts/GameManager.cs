@@ -15,10 +15,17 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if (_instance != null)
-            Destroy(_instance);
-        else
-            _instance = this;
+        switch (_instance)
+        {
+            case null:
+                _instance = this;
+                Debug.Log("Game Manager active");
+                break;
+            default:
+                Destroy(_instance);
+                break;
+        }
+
         DontDestroyOnLoad(this);
     }
 
