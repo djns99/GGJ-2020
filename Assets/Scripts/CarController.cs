@@ -44,7 +44,7 @@ public class CarController : MonoBehaviour
     private void FixedUpdate()
     {
         Debug.Log(carBody.velocity.magnitude);
-        if (carBody.velocity.magnitude <= 50f)
+        if (carBody.velocity.magnitude <= 40f)
         {
             foreach (WheelJoint2D wheelJoint in carBody.GetComponents<WheelJoint2D>())
             {
@@ -96,7 +96,7 @@ public class CarController : MonoBehaviour
         List<Transform> wheels = carPieces.FindAll(element => (element.name.Contains("Front") || element.name.Contains("Back")));
         foreach (Transform wheel in wheels)
         {
-            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 5f)
+            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 50f)
             {
                 Debug.Log("wheel extended");
                 isExploding = true;
