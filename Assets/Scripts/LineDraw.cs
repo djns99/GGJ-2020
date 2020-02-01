@@ -68,7 +68,10 @@ public class LineDraw : MonoBehaviour
                 Vector2 distanceBetweenPoints = line_points[i - 1] - line_points[i];
                 Vector3 crossProduct = Vector3.Cross(distanceBetweenPoints, Vector3.forward);
 
-                Vector2 up = (halfWidth) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
+                int num_smoved = 4;
+                float reduce = i - 1 < num_smoved ? -halfWidth + (line_renderer.startWidth / num_smoved) * (i - 1) : halfWidth; 
+
+                Vector2 up = (reduce) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
                 Vector2 down = -(halfWidth) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
 
                 edgePoints.Insert(0, down);
@@ -81,6 +84,7 @@ public class LineDraw : MonoBehaviour
                     edgePoints.Insert(0, down);
                     edgePoints.Add(up);
                 }
+
             }
 
             poly_collider.SetPath(0, edgePoints.ToArray());
