@@ -43,9 +43,10 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     private void FixedUpdate()
     {
-        Debug.Log(carBody.velocity.magnitude);
-        if (carBody.velocity.magnitude <= 40f)
+        if (carBody.velocity.magnitude <= 10f)
         {
+            Debug.Log(carBody.velocity.normalized);
+            carBody.AddForce(transform.right * 10000);
             foreach (WheelJoint2D wheelJoint in carBody.GetComponents<WheelJoint2D>())
             {
                 JointMotor2D motor = wheelJoint.motor;
@@ -69,21 +70,21 @@ public class CarController : MonoBehaviour
         {
             AnimateCarExplosion();
         }
-        if (!IsCarOnGround())
-        {
-            if (wasOnGround)
-            {
-                carBody.freezeRotation = true;
-                wasOnGround = false;
-            }
-        } else
-        {
-            if (!wasOnGround)
-            {
-                carBody.freezeRotation = false;
-                wasOnGround = true;
-            }
-        }
+        //if (!IsCarOnGround())
+        //{
+        //    if (wasOnGround)
+        //    {
+        //        carBody.freezeRotation = true;
+        //        wasOnGround = false;
+        //    }
+        //} else
+        //{
+        //    if (!wasOnGround)
+        //    {
+        //        carBody.freezeRotation = false;
+        //        wasOnGround = true;
+        //    }
+        //}
     }
 
     private void CheckCarFlippedOrWillExplode()
@@ -96,7 +97,7 @@ public class CarController : MonoBehaviour
         List<Transform> wheels = carPieces.FindAll(element => (element.name.Contains("Front") || element.name.Contains("Back")));
         foreach (Transform wheel in wheels)
         {
-            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 50f)
+            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 20f)
             {
                 Debug.Log("wheel extended");
                 isExploding = true;
