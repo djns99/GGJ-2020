@@ -325,7 +325,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: ae252b0668c94f6449bdd9467ce47908, type: 3}
+  m_audioClip: {fileID: 8300000, guid: e26bd8f88bf17e345a130eaab2a39b0e, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -450,7 +450,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 408819204}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 1}
   m_Children:
   - {fileID: 1741671112}
@@ -996,12 +996,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: c2d3ccf4a8c37cd4cbcff9c6c4b08be6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0bc026f5d5ac31f419935439ab06d3b7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 5, y: 2.33}
+  m_Size: {x: 19.2, y: 9.37}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1501,6 +1501,8 @@ MonoBehaviour:
   bumpyGroundLength: 100
   bumpyGroundNoise: 0.5
   bumpyGroundWeight: 0.5
+  spikePitDepthPixels: 20
+  spikePitWidthPixels: 200
 --- !u!1 &2049732208
 GameObject:
   m_ObjectHideFlags: 0
