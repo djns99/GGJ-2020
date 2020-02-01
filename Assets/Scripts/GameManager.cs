@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 Debug.Log(score);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
             }
         }
     }
