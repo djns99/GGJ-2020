@@ -121,7 +121,7 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     void addPerlinPoint() {
         // Continue with noise
-        var next = new Vector3(progress * segmentWidth - camWidth, getNoise(progress), 0.0f);
+        var next = new Vector3(progress * segmentWidth, getNoise(progress), 0.0f);
         addPointToLinePos(next);
         progress++;
     }
@@ -181,8 +181,19 @@ public class SimpleTrackBuilder : MonoBehaviour
 
         createNewLine();
 
-        updateLine();
-        updateLine();
+        int segmentsInCam = Mathf.CeilToInt(camWidth / segmentWidth);
+        Vector3 pos = new Vector3(-segmentsInCam * segmentWidth, trackAllowedRangeMin, 0);
+        addPointToLinePos(pos);
+        pos.x = segmentsInCam * segmentWidth;
+        addPointToLinePos(pos);
+        progress = segmentsInCam;
+
+        createNewLine();
+
+        bezeirCurveBackToPerlin(pos, 100);
+
+        createNewLine();
+
         updateLine();
     }
 
@@ -218,13 +229,14 @@ public class SimpleTrackBuilder : MonoBehaviour
     {
         // Return to normal
         int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
+        int controlLength = tailWidth / 5;
         progress += tailNumSegments;
         var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
         var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
-        targetControl = target + (targetControl - target).normalized * 10;
+        targetControl = target + (targetControl - target).normalized * controlLength;
         var start = pos;
         var startControl = new Vector3(pos.x + segmentWidth, pos.y);
-        startControl = start + (startControl - start).normalized * 10;
+        startControl = start + (startControl - start).normalized * controlLength;
 
         for (int i = 0; i < tailNumSegments; i++)
         {
