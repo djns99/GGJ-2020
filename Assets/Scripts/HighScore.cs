@@ -24,7 +24,7 @@ public class HighScore : MonoBehaviour
         //Sort the entry list by score
         for (int i = 0; i < highScores.highScoreEntryList.Count; i++)
         {
-            for (int j = i+1; j < highScores.highScoreEntryList.Count; j++)
+            for (int j = i+1; j < highScores.highScoreEntryList.Count; j++) 
             {
                 if (highScores.highScoreEntryList[j].score > highScores.highScoreEntryList[i].score) {
                     HighScoreEntry tmp = highScores.highScoreEntryList[i];
