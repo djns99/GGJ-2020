@@ -10,7 +10,7 @@ public class CarController : MonoBehaviour
     private Rigidbody2D carBody;
     private CarComponent[] carComponents;
 
-    private float explodeCounter = 0.4f;
+    private float explodeCounter = 0.6f;
     public bool isExploding;
     private List<Transform> carPieces;
     private List<Vector3> compDirections;
@@ -71,17 +71,20 @@ public class CarController : MonoBehaviour
         List<Transform> wheels = carPieces.FindAll(element => (element.name.Contains("Front") || element.name.Contains("Back")));
         foreach (Transform wheel in wheels)
         {
-            Debug.Log(wheel.name + "'s distance: " + Vector3.Distance(carBody.transform.position, wheel.transform.position));
-            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 6f) isExploding = true;
+            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 4.5f) isExploding = true;
         }
         
     }
 
     public void AnimateCarExplosion()
     {
+        if (explodeCounter == 0.6f)
+        {
+            carBody.transform.Find("Particles").gameObject.SetActive(true);
+        }
         for (int i = 0; i < carPieces.Count; i++)
         {
-            if (carPieces[i] == carBody.transform || carPieces[i] == transform || carPieces[i].name == "Wheel") continue;
+            if (carPieces[i] == carBody.transform || carPieces[i] == transform || carPieces[i].name == "Wheel" || carPieces[i].name == "Particles") continue;
             
             carPieces[i].position += (carPieces[i].position - carBody.transform.position).normalized * 15f * Time.deltaTime;
             carPieces[i].Rotate(Vector3.forward * Time.deltaTime * 100f);
