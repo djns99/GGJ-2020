@@ -21,6 +21,8 @@ public class CarController : MonoBehaviour
 
     public float prevSpeed;
 
+    public AudioClip crashingSound;
+
 
     private void Start()
     {
@@ -78,9 +80,7 @@ public class CarController : MonoBehaviour
     private void CheckCarFlippedOrWillExplode()
     {
         float currSpeed = carBody.velocity.magnitude;
-        Debug.Log(currSpeed + " vs " + prevSpeed);
-
-        if (prevSpeed - currSpeed >= 60f && IsCarOnGround())
+        if (prevSpeed - currSpeed >= 50f && IsCarOnGround())
         {
             // Dropped too fast
             isExploding = true;
@@ -126,6 +126,7 @@ public class CarController : MonoBehaviour
     {
         if (explodeCounter == 0.6f)
         {
+            SoundManager.sound = crashingSound;
             carBody.transform.Find("Particles").gameObject.SetActive(true);
         }
         for (int i = 0; i < carPieces.Count; i++)
