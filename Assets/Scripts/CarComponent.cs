@@ -10,7 +10,6 @@ public class CarComponent : MonoBehaviour
     {
         if (collision.gameObject.name.Contains("Line"))
         {
-            Debug.Log(collision.relativeVelocity.magnitude);
             CollideWithGround = true;
         }
     }

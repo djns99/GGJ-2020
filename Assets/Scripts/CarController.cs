@@ -15,6 +15,8 @@ public class CarController : MonoBehaviour
     private List<Transform> carPieces;
     private List<Vector3> compDirections;
 
+    private float originalSpeed = -3000f;
+
 
     private void Start()
     {
@@ -41,6 +43,25 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     private void FixedUpdate()
     {
+        Debug.Log(carBody.velocity.magnitude);
+        if (carBody.velocity.magnitude <= 50f)
+        {
+            foreach (WheelJoint2D wheelJoint in carBody.GetComponents<WheelJoint2D>())
+            {
+                JointMotor2D motor = wheelJoint.motor;
+                motor.motorSpeed -= 10f;
+                wheelJoint.motor = motor;
+            }
+        }
+        else
+        {
+            foreach (WheelJoint2D wheelJoint in carBody.GetComponents<WheelJoint2D>())
+            {
+                JointMotor2D motor = wheelJoint.motor;
+                motor.motorSpeed = originalSpeed;
+                wheelJoint.motor = motor;
+            }
+        }
         if (Input.GetKeyDown(KeyCode.F)) isExploding = true;
         if (carBody == null) return;
         if (!isExploding) CheckCarFlippedOrWillExplode();
@@ -67,11 +88,19 @@ public class CarController : MonoBehaviour
 
     private void CheckCarFlippedOrWillExplode()
     {
-        if (carBody.transform.up.y < -0.8f && carBody.transform.up.y > -1f && IsCarOnGround()) isExploding = true;
+        if (carBody.transform.up.y < -0.8f && carBody.transform.up.y > -1f && IsCarOnGround())
+        {
+            Debug.Log("wheel flipped");
+            isExploding = true;
+        }
         List<Transform> wheels = carPieces.FindAll(element => (element.name.Contains("Front") || element.name.Contains("Back")));
         foreach (Transform wheel in wheels)
         {
-            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 4.5f) isExploding = true;
+            if (Vector3.Distance(carBody.transform.position, wheel.transform.position) >= 5f)
+            {
+                Debug.Log("wheel extended");
+                isExploding = true;
+            }
         }
         
     }

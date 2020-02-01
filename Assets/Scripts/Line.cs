@@ -4,9 +4,20 @@ using UnityEngine;
 
 public class Line : MonoBehaviour
 {
+    private float aliveCounter = 10f;
+
+    private void Update()
+    {
+        aliveCounter -= Time.deltaTime;
+
+        if (aliveCounter <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void OnBecameInvisible()
     {
-        Debug.Log("bye line");
         Destroy(gameObject);
     }
 }

@@ -20,7 +20,7 @@ public class CameraFollowing : MonoBehaviour
         if (followingObject != null)
         {
             currCarPos = followingObject.transform.position;
-            Vector3 newCamPos = new Vector3(currCarPos.x + 20, transform.position.y, transform.position.z);
+            Vector3 newCamPos = new Vector3(currCarPos.x + 50f, transform.position.y, transform.position.z);
             transform.position = newCamPos;
         }
     }
