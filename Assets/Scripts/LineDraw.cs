@@ -19,18 +19,6 @@ public class LineDraw : MonoBehaviour
 
     }
 
-    void UpdateCollision( Vector2 mouse_pos)
-    {
-        float halfWidth = line_renderer.startWidth / 2f;
-        Vector2 bottomPoint = mouse_pos;
-        Vector2 topPoint = mouse_pos;
-        bottomPoint.y -= halfWidth;
-        topPoint.y += halfWidth;
-
-        collision_points.Insert(0, bottomPoint);
-        collision_points.Add(topPoint);
-            
-    }
 
     // Update is called once per frame
     void Update()
@@ -48,32 +36,45 @@ public class LineDraw : MonoBehaviour
             collision_points.Clear();
             line_points.Clear();
 
-
             line_points.Add(mouse_pos);
             line_points.Add(mouse_pos);
 
             line_renderer.SetPosition(0, line_points[0]);
             line_renderer.SetPosition(1, line_points[1]);
-            // line_renderer.Simplify();
+            line_renderer.positionCount = 2;
 
-            UpdateCollision(mouse_pos);
 
+            line_renderer.Simplify( 0.5f );
 
         }
         if ( Input.GetMouseButton( 0 ) )
         {
             var finger_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if( Vector2.Distance( finger_pos, line_points[line_points.Count - 1 ]) > 0.25f)
+            if( Vector2.Distance( finger_pos, line_points[line_points.Count - 1 ]) > 0.01f)
             {
                 line_points.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 line_renderer.positionCount++;
                 line_renderer.SetPosition(line_points.Count - 1, line_points[line_points.Count - 1]);
-                UpdateCollision(mouse_pos);
             }
         }
         if( Input.GetMouseButtonUp( 0 ) )
         {
-            poly_collider.SetPath(0, collision_points.ToArray());
+            List<Vector2> edgePoints = new List<Vector2>();
+            float halfWidth = line_renderer.startWidth / 2f;
+
+            for (int i = 1; i < line_points.Count; i++)
+            {
+                Vector2 distanceBetweenPoints = line_points[i - 1] - line_points[i];
+                Vector3 crossProduct = Vector3.Cross(distanceBetweenPoints, Vector3.forward);
+
+                Vector2 up = halfWidth * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
+                Vector2 down = -halfWidth * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
+
+                edgePoints.Insert(0, down);
+                edgePoints.Add(up);
+            }
+
+            poly_collider.SetPath(0, edgePoints.ToArray());
             
             var rig = current_line.GetComponent<Rigidbody2D>();
             rig.isKinematic = false;
