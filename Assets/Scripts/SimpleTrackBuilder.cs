@@ -5,9 +5,9 @@ using UnityEngine;
 public class SimpleTrackBuilder : MonoBehaviour
 {
     public GameObject trackElement;
-    private GameObject line;
     private List<Vector2> linePositions2 = new List<Vector2>();
     private List<Vector3> linePositions3 = new List<Vector3>();
+    private LinkedList<GameObject> lines = new LinkedList<GameObject>();
     public float segmentWidth = 1;
     public int minSegmentsBetweenObstacle = 500;
     public int maxSegmentsBetweenObstacle = 10000;
@@ -15,8 +15,10 @@ public class SimpleTrackBuilder : MonoBehaviour
     public float cameraTrackMinPercent = 0.025f;
     public float cameraTrackMaxPercent = 0.75f;
 
-    public float targetGapWidthPixels = 20.0f;
+    public float gapWidthPixels = 20.0f;
     public float maxCliffHeightPixels = 20.0f;
+    public float jumpCliffWidthPixels = 20.0f;
+    public float jumpCliffMaxHeightPixels = 20.0f;
 
     private int progress = 0;
     private int nextObstacleProgressMin;
@@ -24,8 +26,6 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     private float trackAllowedRangeMin;
     private float trackAllowedRangeMax;
-
-    long lineIndex = 1;
 
     Camera cam;
     float camHeight;
@@ -39,29 +39,6 @@ public class SimpleTrackBuilder : MonoBehaviour
         float noise = Mathf.PerlinNoise(val * segmentWidth * 0.01f, trackSeed);
         noise = Mathf.Clamp01(noise);
         return noise * trackWidth + trackAllowedRangeMin;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        trackSeed = Random.Range(0, 100f);
-        cam = Camera.main;
-        camHeight = cam.orthographicSize * 2;
-        camWidth = camHeight * cam.aspect;
-        numSegmentsInViewport = Mathf.CeilToInt(camWidth / segmentWidth);
-
-        trackAllowedRangeMin = camHeight * cameraTrackMinPercent - camHeight / 2;
-        trackAllowedRangeMax = camHeight * cameraTrackMaxPercent - camHeight / 2;
-
-        nextObstacleProgressMin = minSegmentsBetweenObstacle;
-        nextObstacleProgressMax = maxSegmentsBetweenObstacle;
-
-        line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
-
-        updateLine();
-        updateLine();
-        updateLine();
-        lineIndex = 2;
     }
 
     void addPointToLinePos(Vector3 vec)
@@ -88,119 +65,52 @@ public class SimpleTrackBuilder : MonoBehaviour
         return Mathf.Pow(1f - t, 3f) * p0 + 3f * Mathf.Pow(1f - t, 2f) * t * p1 + 3f * (1f - t) * Mathf.Pow(t, 2f) * p2 + Mathf.Pow(t, 3f) * p3;
     }
 
-    void addObstacle()
-    {
-        int numObstacles = 3;
-        int objectId = Random.Range(0, numObstacles);
-        switch (objectId) {
-            case 0:
-                {
-                    float targetWidth = targetGapWidthPixels;
-                    int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
-                    float realWidth = numSegments * segmentWidth;
-                    progress += numSegments;
+    void createNewLine() {
+        if (linePositions3.Count > 1)
+        {
+            var line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
 
-                    // Drop off bottom of screen
-                    var pos = linePositions3[linePositions3.Count - 1];
-                    pos.y = -camHeight;
-                    addPointToLinePos(pos);
+            Vector3 first = linePositions3[0];
+            Vector3 last = linePositions3[linePositions3.Count - 1];
+            Vector3 lastCopy = last;
+            last.y = -camHeight * 4;
+            linePositions2.Add(last);
+            first.y = -camHeight * 4;
+            linePositions2.Add(first);
 
-                    // Skip to other side
-                    pos.x += realWidth;
-                    addPointToLinePos(pos);
+            var collider = line.GetComponent<PolygonCollider2D>();
+            collider.SetPath(0, linePositions2.ToArray());
+            var line_renderer = line.GetComponent<LineRenderer>();
+            line_renderer.positionCount = linePositions3.Count;
+            line_renderer.SetPositions(linePositions3.ToArray());
+            lines.AddLast(line);
 
-                    // Come back up the other side
-                    pos.y = getNoise(progress - 1);
-                    addPointToLinePos(pos);
-                    return;
-                }
-            case 1:
-                {
-                    // Flat leading up to cliff
-                    int headWidth = 10;
-                    int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
-                    progress += headNumSegments;
+            linePositions2.Clear();
+            linePositions3.Clear();
 
-                    var pos = linePositions3[linePositions3.Count - 1];
-                    var posPrev = linePositions3[linePositions3.Count - 2];
-                    var dir = pos - posPrev;
-                    for (int i = 0; i < headNumSegments; i++)
-                    {
-                        dir.y *= 0.7f;
-                        pos += dir;
-                        addPointToLinePos(pos);
-                    }
-
-                    // Cliff
-                    pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
-                    addPointToLinePos(pos);
-
-                    // Return to normal
-                    int tailWidth = 50;
-                    int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
-                    progress += tailNumSegments;
-                    var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
-                    var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
-                    var start = pos;
-                    var startControl = new Vector3(pos.x + segmentWidth, pos.y + segmentWidth / 10f);
-
-                    for (int i = 0; i < tailNumSegments; i++) {
-                        pos.y = getBezierPos(start, startControl, target, targetControl, (float)i / tailNumSegments).y;
-                        pos.x += segmentWidth;
-                        addPointToLinePos(pos);
-                    }
-                }
-                return;
-            case 2:
-                {
-                    // Cliff
-                    var pos = linePositions3[linePositions3.Count - 1];
-                    pos.y = Mathf.Max(trackAllowedRangeMin, pos.y - maxCliffHeightPixels);
-                    addPointToLinePos(pos);
-
-                    // Flat at bottom of cliff
-                    int headWidth = 50;
-                    int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
-                    progress += headNumSegments;
-
-                    for (int i = 0; i < headNumSegments; i++)
-                    {
-                        pos.x += segmentWidth;
-                        addPointToLinePos(pos);
-                    }
-
-                    // Return to normal
-                    int tailWidth = 50;
-                    int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
-                    progress += tailNumSegments;
-                    var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
-                    var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
-                    var start = pos;
-                    var startControl = new Vector3(pos.x + segmentWidth, pos.y);
-
-                    for (int i = 0; i < tailNumSegments; i++)
-                    {
-                        pos.y = getBezierPos(start, startControl, target, targetControl, (float)i / tailNumSegments).y;
-                        pos.x += segmentWidth;
-                        addPointToLinePos(pos);
-                    }
-                }
-                return;
+            addPointToLinePos(lastCopy);
         }
+    }
+
+    Vector3 getLinePointAtIndex(GameObject line, int index) {
+        var renderer = line.GetComponent<LineRenderer>();
+        return renderer.GetPosition(index >= 0 ? index : (renderer.positionCount + index));
     }
 
     void updateLine()
     {
-        int numToRemove = 0;
-        for (numToRemove = 0; numToRemove < linePositions3.Count && cam.WorldToViewportPoint(linePositions3[numToRemove]).x < -0.2f; numToRemove++)
-            ;
-
-        linePositions2.RemoveRange(0, numToRemove);
-        linePositions3.RemoveRange(0, numToRemove);
-
-        if (linePositions2.Count > 0)
+        while (lines.Count != 0)
         {
-            linePositions2.RemoveRange(linePositions2.Count - 2, 2);
+            var line = lines.First.Value;
+            if (line.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLinePointAtIndex(lines.First.Value, -1)).x < -0.2f)
+            {
+                Destroy(line);
+                lines.RemoveFirst();
+            }
+            else
+            {
+                break;
+            }
         }
 
         var endProgress = progress + numSegmentsInViewport;
@@ -212,9 +122,13 @@ public class SimpleTrackBuilder : MonoBehaviour
             bool forcedObstacle = progress >= nextObstacleProgressMax;
             if (randomChoiceObstacle || forcedObstacle)
             {
+                // New line when we create an obstacle
+                createNewLine();
                 addObstacle();
                 nextObstacleProgressMin = progress + minSegmentsBetweenObstacle;
                 nextObstacleProgressMax = progress + maxSegmentsBetweenObstacle;
+                // New line after we finish with the obstacle
+                createNewLine();
             }
             else
             {
@@ -225,26 +139,187 @@ public class SimpleTrackBuilder : MonoBehaviour
             }
         }
 
-        Vector3 first = linePositions3[0];
-        Vector3 last = linePositions3[linePositions3.Count - 1];
-        last.y = -camHeight * 4;
-        linePositions2.Add(last);
-        first.y = -camHeight * 4;
-        linePositions2.Add(first);
+        createNewLine();
+    }
 
-        var collider = line.GetComponent<PolygonCollider2D>();
-        collider.SetPath(0, linePositions2.ToArray());
-        var line_renderer = line.GetComponent<LineRenderer>();
-        line_renderer.positionCount = linePositions3.Count;
-        line_renderer.SetPositions(linePositions3.ToArray());
+    // Start is called before the first frame update
+    void Start()
+    {
+        trackSeed = Random.Range(0, 100f);
+        cam = Camera.main;
+        camHeight = cam.orthographicSize * 2;
+        camWidth = camHeight * cam.aspect;
+        numSegmentsInViewport = Mathf.CeilToInt(camWidth / segmentWidth);
+
+        trackAllowedRangeMin = camHeight * cameraTrackMinPercent - camHeight / 2;
+        trackAllowedRangeMax = camHeight * cameraTrackMaxPercent - camHeight / 2;
+
+        nextObstacleProgressMin = Mathf.Max(minSegmentsBetweenObstacle, numSegmentsInViewport * 2);
+        nextObstacleProgressMax = nextObstacleProgressMin + (maxSegmentsBetweenObstacle - minSegmentsBetweenObstacle);
+
+        createNewLine();
+
+        updateLine();
+        updateLine();
+        updateLine();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (cam.WorldToViewportPoint(linePositions3[linePositions3.Count - 1]).x < 1.1f)
+        if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 1.2f)
         {
             updateLine();
         }
     }
+
+    #region obstacles
+
+    void gap() {
+        var lastPos = linePositions3[0];
+
+        float targetWidth = gapWidthPixels;
+        int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
+        float realWidth = numSegments * segmentWidth;
+        progress += numSegments;
+
+        // Drop off bottom of screen
+        var pos = lastPos;
+        pos.y = -camHeight;
+        addPointToLinePos(pos);
+
+        // Skip to other side
+        pos.x += realWidth;
+        addPointToLinePos(pos);
+
+        // Come back up the other side
+        pos.y = getNoise(progress - 1);
+        addPointToLinePos(pos);
+    }
+
+    void bezeirCurveBackToPerlin(Vector3 pos) {
+        // Return to normal
+        int tailWidth = 50;
+        int tailNumSegments = Mathf.CeilToInt(tailWidth / segmentWidth);
+        progress += tailNumSegments;
+        var target = new Vector3(pos.x + tailNumSegments * segmentWidth, getNoise(progress));
+        var targetControl = new Vector3(pos.x + (tailNumSegments - 1) * segmentWidth, getNoise(progress - 1));
+        var start = pos;
+        var startControl = new Vector3(pos.x + segmentWidth, pos.y);
+
+        for (int i = 0; i < tailNumSegments; i++)
+        {
+            pos.y = getBezierPos(start, startControl, target, targetControl, (float)i / tailNumSegments).y;
+            pos.x += segmentWidth;
+            addPointToLinePos(pos);
+        }
+    }
+
+    void jumpCliff() {
+        var lastPos = linePositions3[0];
+
+        float targetWidth = jumpCliffWidthPixels;
+        int numSegments = Mathf.CeilToInt(targetWidth / segmentWidth);
+        float realWidth = numSegments * segmentWidth;
+        progress += numSegments;
+
+        // Drop off bottom of screen
+        var pos = lastPos;
+        pos.y = -camHeight;
+        addPointToLinePos(pos);
+
+        // Skip to other side
+        pos.x += realWidth;
+        addPointToLinePos(pos);
+
+        // Cliff
+        pos.y = Mathf.Max(trackAllowedRangeMin, lastPos.y - jumpCliffMaxHeightPixels);
+        addPointToLinePos(pos);
+
+
+        // Flat to land on
+        int headWidth = 50;
+        int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
+        progress += headNumSegments;
+
+        for (int i = 0; i < headNumSegments; i++)
+        {
+            pos.x += segmentWidth;
+            addPointToLinePos(pos);
+        }
+
+        bezeirCurveBackToPerlin(pos);
+    }
+
+    void cliffUp() {
+        var lastPos = linePositions3[0];
+
+        // Flat leading up to cliff
+        int headWidth = 10;
+        int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
+        progress += headNumSegments;
+
+        var pos = lastPos;
+        var posPrev = getLinePointAtIndex(lines.Last.Value, -2);
+        var dir = pos - posPrev;
+        for (int i = 0; i < headNumSegments; i++)
+        {
+            dir.y *= 0.7f;
+            pos += dir;
+            addPointToLinePos(pos);
+        }
+
+        // Cliff
+        pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
+        addPointToLinePos(pos);
+
+        bezeirCurveBackToPerlin(pos);
+    }
+
+    void cliffDown() {
+        var lastPos = linePositions3[0];
+
+        // Cliff
+        var pos = lastPos;
+        pos.y = Mathf.Max(trackAllowedRangeMin, pos.y - maxCliffHeightPixels);
+        addPointToLinePos(pos);
+
+        // Flat at bottom of cliff
+        int headWidth = 50;
+        int headNumSegments = Mathf.CeilToInt(headWidth / segmentWidth);
+        progress += headNumSegments;
+
+        for (int i = 0; i < headNumSegments; i++)
+        {
+            pos.x += segmentWidth;
+            addPointToLinePos(pos);
+        }
+
+        // Return to normal
+        bezeirCurveBackToPerlin(pos);
+    }
+
+    void addObstacle()
+    {
+        var lastPos = getLinePointAtIndex(lines.Last.Value, -1);
+
+        int numObstacles = 4;
+        int objectId = Random.Range(0, numObstacles);
+        switch (objectId)
+        {
+            case 0:
+                gap();
+                return;
+            case 1:
+                cliffUp();
+                return;
+            case 2:
+                cliffDown();
+                return;
+            case 3:
+                jumpCliff();
+                return;
+        }
+    }
+    #endregion
 }
