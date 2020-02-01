@@ -20,7 +20,6 @@ public class SoundManager : MonoBehaviour
         {
             source.PlayOneShot(sound, 0.2f);
             sound = null;
-            Debug.Log("played twice?");
         }
     }
 }

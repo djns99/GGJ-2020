@@ -24,7 +24,6 @@ public class GameManager : MonoBehaviour
 
     public void AssignPlayer()
     {
-        //player_name = 
         GameObject inputField = GameObject.Find("InputField");
         if ( inputField != null)
         {
