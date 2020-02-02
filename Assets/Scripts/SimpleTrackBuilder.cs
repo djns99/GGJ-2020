@@ -35,6 +35,13 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     public int numObstacles = 9;
 
+    public Material bridgeMaterial;
+    public Material groundMaterial;
+
+    public Material bridgeLineMaterial;
+    public Material groundLineMaterial;
+    public Material spikeLineMaterial;
+
     private int progress = 0;
     private int nextObstacleProgressMin;
     private int nextObstacleProgressMax;
@@ -83,7 +90,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         return Mathf.Pow(1f - t, 3f) * p0 + 3f * Mathf.Pow(1f - t, 2f) * t * p1 + 3f * (1f - t) * Mathf.Pow(t, 2f) * p2 + Mathf.Pow(t, 3f) * p3;
     }
 
-    void createNewLine(bool linkPrevious = true) {
+    void createNewLine(bool linkPrevious = true, Material material = null, Material lineMaterial = null) {
         if (linePositions3.Count > 1)
         {
             var line = Instantiate(trackElement, new Vector3(), Quaternion.identity);
@@ -103,8 +110,25 @@ public class SimpleTrackBuilder : MonoBehaviour
             line_renderer.SetPositions(linePositions3.ToArray());
             lines.AddLast(line);
 
+            if (material != null)
+            {
+                line.GetComponent<MeshRenderer>().material = material;
+                line.GetComponent<LineRenderer>().material = lineMaterial;
+            }
+            else
+            {
+                line.GetComponent<MeshRenderer>().material = groundMaterial;
+                line.GetComponent<LineRenderer>().material = groundLineMaterial;
+            }
             var mesh_filter = line.GetComponent<MeshFilter>();
-            mesh_filter.mesh = collider.CreateMesh(true, false);
+            mesh_filter.mesh = collider.CreateMesh(false, false);
+            mesh_filter.mesh.SetUVs(0, mesh_filter.mesh.vertices);
+           
+            List<Vector3> normals = new List<Vector3>();
+            foreach (var _ in mesh_filter.mesh.vertices) {
+                normals.Add(Vector3.back);
+            }
+            mesh_filter.mesh.SetNormals(normals);
 
             linePositions2.Clear();
             linePositions3.Clear();
@@ -279,7 +303,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine(false);
+        createNewLine(false, bridgeMaterial, bridgeLineMaterial);
 
         // Gap
         float targetWidth = gapWidthPixels;
@@ -296,7 +320,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End obstalce
-        createNewLine();
+        createNewLine(true, bridgeMaterial, bridgeLineMaterial);
 
         // Ease back into normal oepration
         bezeirCurveBackToPerlin(pos);
@@ -322,7 +346,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine(false);
+        createNewLine(false, bridgeMaterial, bridgeLineMaterial);
 
         // Gap
         float targetWidth = flatGapWidthPixels;
@@ -339,7 +363,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End obstalce
-        createNewLine();
+        createNewLine(true, bridgeMaterial, bridgeLineMaterial);
 
         // Ease back into normal oepration
         bezeirCurveBackToPerlin(pos);
@@ -363,7 +387,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine(false);
+        createNewLine(false, bridgeMaterial, bridgeLineMaterial);
 
         // Gap
         float targetWidth = gapWidthPixels;
@@ -383,7 +407,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End obstalce
-        createNewLine();
+        createNewLine(true, bridgeMaterial, bridgeLineMaterial);
 
         // Ease back into normal oepration
         bezeirCurveBackToPerlin(pos);
@@ -601,7 +625,7 @@ public class SimpleTrackBuilder : MonoBehaviour
             progress++;
         }
 
-        createNewLine(false);
+        createNewLine(false, groundMaterial, spikeLineMaterial);
 
         // Cliff
         pos.y = originalY;
@@ -635,7 +659,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine(false);
+        createNewLine(false, bridgeMaterial, bridgeLineMaterial);
 
         // Gap
         int numSegments = Mathf.CeilToInt(jumpPitWidthPixels / segmentWidth);
@@ -660,7 +684,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += jumpPitMidWidthSegments + halfSegments;
         pos.x += halfWidth;
 
-        createNewLine(false);
+        createNewLine(false, bridgeMaterial, bridgeLineMaterial);
 
         int numTrailOff = 10;
         pos.y = getNoise(progress + numTrailOff);
@@ -670,7 +694,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End obstalce
-        createNewLine();
+        createNewLine(true, bridgeMaterial, bridgeLineMaterial);
 
         // Ease back into normal oepration
         bezeirCurveBackToPerlin(pos);
