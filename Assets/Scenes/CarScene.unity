@@ -1973,7 +1973,6 @@ MonoBehaviour:
   line_renderer: {fileID: 0}
   poly_collider: {fileID: 0}
   line_points: []
-  collision_points: []
   builder: {fileID: 1946162268}
 --- !u!114 &1946162268
 MonoBehaviour:
@@ -1994,17 +1993,17 @@ MonoBehaviour:
   maxSegmentsBetweenObstacle: 15
   cameraTrackMinPercent: 0.1
   cameraTrackMaxPercent: 0.6
-  flatGapWidthPixels: 20
-  gapWidthPixels: 20
-  maxCliffHeightPixels: 10
+  flatGapWidthPixels: 40
+  gapWidthPixels: 40
+  maxCliffHeightPixels: 30
   jumpCliffWidthPixels: 20
-  jumpCliffMaxHeightPixels: 20
+  jumpCliffMaxHeightPixels: 50
   bumpyGroundLength: 100
   bumpyGroundNoise: 0.5
   bumpyGroundWeight: 0.5
   spikePitDepthPixels: 20
   spikePitWidthPixels: 200
-  jumpPitWidthPixels: 100
+  jumpPitWidthPixels: 95
   jumpPitMidWidthSegments: 10
   pylonMaxHeight: 30
   pylonWidthSegments: 10
