@@ -1345,7 +1345,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1539434123
 GameObject:
@@ -1758,7 +1758,7 @@ RectTransform:
   - {fileID: 684081883}
   - {fileID: 1925620551}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2010,7 +2010,7 @@ MonoBehaviour:
   pylonPitMaxHeight: 30
   pylonPitWidthPixels: 60
   numObstacles: 9
-  bridgeMaterial: {fileID: 2100000, guid: 97c31df76780fa54bb7d7123334a71b8, type: 2}
+  bridgeMaterial: {fileID: 2100000, guid: 40ca28934d922eb488ee8ea0277b1b0d, type: 2}
   groundMaterial: {fileID: 2100000, guid: a6c1d99f36adc9248ab1fb6888faab3e, type: 2}
   bridgeLineMaterial: {fileID: 2100000, guid: 50636e708715e3547abc8bc2d3320fbb, type: 2}
   groundLineMaterial: {fileID: 2100000, guid: 60308da71cf10b7438190189f41269c3, type: 2}
