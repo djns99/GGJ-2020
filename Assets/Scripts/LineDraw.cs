@@ -60,6 +60,11 @@ public class LineDraw : MonoBehaviour
         }
         if( Input.GetMouseButtonUp( 0 ) )
         {
+            if (inside)
+            {
+                return;
+            }
+
             List<Vector2> edgePoints = new List<Vector2>();
             float halfWidth = line_renderer.startWidth / 2f;
             line_renderer.Simplify(0.5f);
