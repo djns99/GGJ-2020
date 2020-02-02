@@ -6,9 +6,13 @@ using UnityEngine.SceneManagement;
 public class SimpleTrackBuilder : MonoBehaviour
 {
     public GameObject trackElement;
+    public GameObject deathCollider;
+
     private List<Vector2> linePositions2 = new List<Vector2>();
     private List<Vector3> linePositions3 = new List<Vector3>();
     private LinkedList<GameObject> lines = new LinkedList<GameObject>();
+    private LinkedList<GameObject> deathColliders = new LinkedList<GameObject>();
+    
     public float segmentWidth = 1;
     public int minSegmentsBetweenObstacle = 500;
     public int maxSegmentsBetweenObstacle = 10000;
@@ -230,12 +234,25 @@ public class SimpleTrackBuilder : MonoBehaviour
         updateLine();
     }
 
+
     // Update is called once per frame
     void Update()
     {
         if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 1.2f)
         {
             updateLine();
+            while (deathColliders.Count != 0) {
+                var front = deathColliders.First.Value;
+                if (cam.WorldToViewportPoint(front.GetComponent<EdgeCollider2D>().points[0]).x < -0.2f)
+                {
+                    Destroy(front);
+                    deathColliders.RemoveFirst();
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         // Spawn car
@@ -246,6 +263,15 @@ public class SimpleTrackBuilder : MonoBehaviour
     }
 
     #region obstacles
+
+    void addDeathEdge(Vector2 start, Vector2 end) {
+        var objectCollider = Instantiate(deathCollider, start, Quaternion.identity);
+        var collider = objectCollider.GetComponent<EdgeCollider2D>();
+        collider.points = new Vector2[] { start, end };
+        collider.isTrigger = true;
+        collider.name = "Death";
+        deathColliders.AddLast(objectCollider);
+    }
 
     Vector3 smoothIntoFlat(Vector3 pos, Vector3 prevPos) {
         var dir = pos - prevPos;
@@ -438,9 +464,16 @@ public class SimpleTrackBuilder : MonoBehaviour
 
         createNewLine(false);
 
+        var edge1 = pos;
+
         // Cliff
         pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
         addPointToLinePos(pos);
+
+        var edge2 = pos;
+        // Make sure we dont kill someone on top
+        edge2.y -= 1f;
+        addDeathEdge(edge1, edge2);
 
         int numTrailOff = 10;
         pos.x += segmentWidth * numTrailOff;
@@ -521,8 +554,15 @@ public class SimpleTrackBuilder : MonoBehaviour
 
         createNewLine(false);
 
+        var pylonBottom = pos;
+
         pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + pylonMaxHeight);
         addPointToLinePos(pos);
+
+        var pylonTop = pos;
+        // Make sure we dont kill someone on top
+        pylonTop.y -= 1f;
+        addDeathEdge(pylonBottom, pylonTop);
 
         pos.x += pylonWidthSegments * segmentWidth;
         progress += pylonWidthSegments;
@@ -562,8 +602,15 @@ public class SimpleTrackBuilder : MonoBehaviour
 
         createNewLine(false);
 
-        pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + pylonMaxHeight);
+        var pylonBottom = pos;
+
+        pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + pylonPitMaxHeight);
         addPointToLinePos(pos);
+
+        var pylonTop = pos;
+        // Make sure we dont kill someone on top
+        pylonTop.y -= 1f;
+        addDeathEdge(pylonBottom, pylonTop);
 
         pos.x += pylonWidthSegments * segmentWidth;
         progress += pylonWidthSegments;
@@ -623,6 +670,9 @@ public class SimpleTrackBuilder : MonoBehaviour
         // Make sure multiple 4 number of spikes
         spikePitSegments += 4 - spikePitSegments % 4;
         float spikeSum = (originalY - pos.y) * 0.2f;
+
+        var lastBoundingPoint = pos;
+
         for (int i = 0; i < spikePitSegments; i++) {
             pos.x += segmentWidth;
             pos.y += spikeSum;
@@ -631,6 +681,14 @@ public class SimpleTrackBuilder : MonoBehaviour
                 spikeSum *= -1;
             }
             addPointToLinePos(pos);
+            // Tweak bounding box
+            Vector2 boundingTweak = linePositions2[linePositions2.Count - 1];
+            boundingTweak.y += trackElement.GetComponent<LineRenderer>().startWidth;
+            linePositions2[linePositions2.Count - 1] = boundingTweak;
+            // Add insta-death collider
+            addDeathEdge(lastBoundingPoint, boundingTweak);
+            lastBoundingPoint = boundingTweak;
+
             progress++;
         }
 
