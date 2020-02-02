@@ -163,7 +163,7 @@ public class SimpleTrackBuilder : MonoBehaviour
         while (lines.Count != 0)
         {
             var line = lines.First.Value;
-            if (line.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLinePointAtIndex(lines.First.Value, -1)).x < -0.2f)
+            if (line.GetComponent<LineRenderer>().positionCount != 0 && cam.WorldToViewportPoint(getLinePointAtIndex(lines.First.Value, -1)).x < -3f)
             {
                 Destroy(line);
                 lines.RemoveFirst();
@@ -232,7 +232,7 @@ public class SimpleTrackBuilder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 3f)
+        if (cam.WorldToViewportPoint(getLinePointAtIndex(lines.Last.Value, -1)).x < 1.2f)
         {
             updateLine();
         }
