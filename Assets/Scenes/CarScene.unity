@@ -450,7 +450,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 408819204}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: -9.46, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 1}
   m_Children:
   - {fileID: 1741671112}
@@ -1575,8 +1575,8 @@ WheelJoint2D:
     m_Angle: 90
   m_UseMotor: 1
   m_Motor:
-    m_MotorSpeed: -3000
-    m_MaximumMotorForce: 10000
+    m_MotorSpeed: -2000
+    m_MaximumMotorForce: 30000
 --- !u!4 &1741671112
 Transform:
   m_ObjectHideFlags: 0
@@ -1619,8 +1619,8 @@ WheelJoint2D:
     m_Angle: 90
   m_UseMotor: 1
   m_Motor:
-    m_MotorSpeed: -3000
-    m_MaximumMotorForce: 10000
+    m_MotorSpeed: -2000
+    m_MaximumMotorForce: 30000
 --- !u!60 &1741671114
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1997,7 +1997,7 @@ MonoBehaviour:
   cameraTrackMaxPercent: 0.6
   flatGapWidthPixels: 40
   gapWidthPixels: 40
-  maxCliffHeightPixels: 30
+  maxCliffHeightPixels: 80
   jumpCliffWidthPixels: 20
   jumpCliffMaxHeightPixels: 50
   bumpyGroundLength: 100
