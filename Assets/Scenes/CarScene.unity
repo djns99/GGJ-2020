@@ -1864,6 +1864,7 @@ MonoBehaviour:
   poly_collider: {fileID: 0}
   line_points: []
   builder: {fileID: 1946162268}
+  cam: {fileID: 1946162263}
 --- !u!114 &1946162268
 MonoBehaviour:
   m_ObjectHideFlags: 0

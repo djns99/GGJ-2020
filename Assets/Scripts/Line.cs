@@ -5,19 +5,23 @@ using UnityEngine;
 public class Line : MonoBehaviour
 {
     private float aliveCounter = 10f;
+    public Camera cam;
+    public Vector3 position;
+    public bool building = false;
 
     private void Update()
     {
         aliveCounter -= Time.deltaTime;
 
-        if (aliveCounter <= 0)
+        if (aliveCounter <= 0 || cam.ScreenToViewportPoint(position).x < -3f)
         {
-            Destroy(gameObject);
+            if(!building)
+                Destroy(gameObject);
         }
     }
 
     void OnBecameInvisible()
     {
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 }
