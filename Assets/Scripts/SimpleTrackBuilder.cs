@@ -49,6 +49,14 @@ public class SimpleTrackBuilder : MonoBehaviour
     private float trackAllowedRangeMin;
     private float trackAllowedRangeMax;
 
+    public bool pointIsInTrack(Vector3 vec) {
+        foreach (var line in lines) {
+            if (line.GetComponent<PolygonCollider2D>().bounds.Contains(vec))
+                return true;
+        }
+        return false;
+    }
+
 
     Camera cam;
     float camHeight;
