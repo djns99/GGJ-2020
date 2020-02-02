@@ -11,6 +11,7 @@ public class LineDraw : MonoBehaviour
     public List<Vector2> line_points;
     public SimpleTrackBuilder builder;
     bool inside = false;
+    bool drawn = false;
 
     // Update is called once per frame
     void Update()
@@ -19,6 +20,7 @@ public class LineDraw : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) || (inside && Input.GetMouseButton(0)) )
         {
+            drawn = false;
             if (builder.pointIsInTrack(mouse_pos))
             {
                 Debug.Log("INSIDE GROUND Clicks");
@@ -42,14 +44,46 @@ public class LineDraw : MonoBehaviour
             line_renderer.SetPosition(1, line_points[1]);
             line_renderer.positionCount = 2;
         }
-        if ( Input.GetMouseButton( 0 ) )
+        if (Input.GetMouseButton(0) && !drawn )
         {
             var finger_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             if( Vector2.Distance( finger_pos, line_points[line_points.Count - 1 ]) > 2f)
             {
                 if (builder.pointIsInTrack(mouse_pos))
                 {
-                    Debug.Log("INSIDE GROUND hold");
+                    List<Vector2> edgePoints = new List<Vector2>();
+                    float halfWidth = line_renderer.startWidth / 2f;
+                    line_renderer.Simplify(0.5f);
+
+                    for (int i = 1; i < line_points.Count; i++)
+                    {
+                        Vector2 distanceBetweenPoints = line_points[i - 1] - line_points[i];
+                        Vector3 crossProduct = Vector3.Cross(distanceBetweenPoints, Vector3.forward);
+
+                        int num_smoved = 5;
+                        float reduce = i - 1 < num_smoved ? -halfWidth + (halfWidth / num_smoved) * (i - 1) : 0;
+
+                        Vector2 up = (reduce) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
+                        Vector2 down = -(halfWidth) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
+
+                        edgePoints.Insert(0, down);
+                        edgePoints.Add(up);
+
+                        if (i == line_points.Count - 1)
+                        {
+                            up = line_points[i];
+                            down = -halfWidth * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i];
+                            edgePoints.Insert(0, down);
+                            edgePoints.Add(up);
+                        }
+
+                    }
+
+                    poly_collider.SetPath(0, edgePoints.ToArray());
+
+                    var rig = current_line.GetComponent<Rigidbody2D>();
+                    rig.isKinematic = false;
+                    drawn = true;
                     return;
                 }
 
@@ -58,12 +92,8 @@ public class LineDraw : MonoBehaviour
                 line_renderer.SetPosition(line_points.Count - 1, line_points[line_points.Count - 1]);
             }
         }
-        if( Input.GetMouseButtonUp( 0 ) )
+        if( Input.GetMouseButtonUp( 0 ) && !drawn && !inside )
         {
-            if (inside)
-            {
-                return;
-            }
 
             List<Vector2> edgePoints = new List<Vector2>();
             float halfWidth = line_renderer.startWidth / 2f;
