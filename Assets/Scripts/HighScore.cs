@@ -7,6 +7,7 @@ public class HighScore : MonoBehaviour
 {
     private Transform entryContainer;
     private Transform entryTemplate;
+    private int firstWakeUp = 0;
     private List<Transform> highScoreEntryTransformList;
 
     public void Awake()
@@ -16,7 +17,7 @@ public class HighScore : MonoBehaviour
 
         entryTemplate.gameObject.SetActive(false);
 
-        //AddHighScoreEntry(10000, "Sid");
+        AddHighScoreEntry(10000, "Sid");
 
         string jsonString = PlayerPrefs.GetString("highScoreTable");
         HighScores highScores = JsonUtility.FromJson<HighScores>(jsonString);
@@ -76,11 +77,15 @@ public class HighScore : MonoBehaviour
     private void AddHighScoreEntry(int score, string name)
     {
         //Create High Score Entry
-        HighScoreEntry highScoreEntry = new HighScoreEntry { score = score, name = name };
+        HighScoreEntry highScoreEntry = new HighScoreEntry ( score, name );
 
         //Load saved high scores
+        HighScores highScores = new HighScores();
         string jsonString = PlayerPrefs.GetString("highScoreTable");
-        HighScores highScores = JsonUtility.FromJson<HighScores>(jsonString);
+        if (jsonString != null && firstWakeUp != 0) {
+            highScores = JsonUtility.FromJson<HighScores>(jsonString);
+        }
+        firstWakeUp++;
 
         //Add new entry to highscores
         highScores.highScoreEntryList.Add(highScoreEntry);
@@ -91,17 +96,34 @@ public class HighScore : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    private class HighScores
+    public class HighScores
     {
         public List<HighScoreEntry> highScoreEntryList;
+
+        public HighScores()
+        {
+            highScoreEntryList = new List<HighScoreEntry>();
+        }
     }
     /*
      * Represents a single high score entry
      * */
     [System.Serializable]
-    private class HighScoreEntry
+    public class HighScoreEntry
     {
         public int score;
-        public string name;  
+        public string name;
+
+        public HighScoreEntry()
+        {
+            score = 0;
+            name = "Player";
+        }
+
+        public HighScoreEntry(int score, string name)
+        {
+            this.score = score;
+            this.name = name;
+        }
     }
 }
