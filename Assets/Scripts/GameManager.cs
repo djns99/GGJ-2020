@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Game Manager active");
                 break;
             default:
-                Destroy(_instance);
+                Destroy(GameObject.Find("GameManager"));
                 _instance = this;
                 break;
         }
