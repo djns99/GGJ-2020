@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
                 break;
             default:
                 Destroy(_instance);
+                _instance = this;
                 break;
         }
 

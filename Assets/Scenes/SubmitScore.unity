@@ -1474,7 +1474,7 @@ GameObject:
   - component: {fileID: 1921666641}
   - component: {fileID: 1921666640}
   m_Layer: 5
-  m_Name: quit
+  m_Name: mainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1496,8 +1496,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -27, y: -142}
-  m_SizeDelta: {x: 200, y: 60}
+  m_AnchoredPosition: {x: 29.05, y: -154}
+  m_SizeDelta: {x: 400, y: 60}
   m_Pivot: {x: 0.5, y: -0.4786078}
 --- !u!114 &1921666640
 MonoBehaviour:
@@ -1543,7 +1543,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 621689209}
-        m_MethodName: QuitGame
+        m_MethodName: MainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1571,7 +1571,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9c688b7e07e4af347b4fc0c8d2e7b914, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 15782f5137142ea43b168c4b663a91f5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
