@@ -254,6 +254,11 @@ MonoBehaviour:
   pylonPitMaxHeight: 30
   pylonPitWidthPixels: 30
   numObstacles: 9
+  bridgeMaterial: {fileID: 2100000, guid: 97c31df76780fa54bb7d7123334a71b8, type: 2}
+  groundMaterial: {fileID: 2100000, guid: a6c1d99f36adc9248ab1fb6888faab3e, type: 2}
+  bridgeLineMaterial: {fileID: 2100000, guid: 50636e708715e3547abc8bc2d3320fbb, type: 2}
+  groundLineMaterial: {fileID: 2100000, guid: 60308da71cf10b7438190189f41269c3, type: 2}
+  spikeLineMaterial: {fileID: 2100000, guid: 96434945fb4f6864698e4d158ec1d5a5, type: 2}
 --- !u!1 &878559929
 GameObject:
   m_ObjectHideFlags: 0
