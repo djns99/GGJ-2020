@@ -14,6 +14,11 @@ public class CarComponent : MonoBehaviour
         {
             CollideWithGround = true;
         }
+
+        if (collision.gameObject.name.Contains("Death"))
+        {
+            IsOutOfScreen = true;
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -21,6 +26,11 @@ public class CarComponent : MonoBehaviour
         if (collision.gameObject.name.Contains("Line"))
         {
             CollideWithGround = false;
+        }
+
+        if (collision.gameObject.name.Contains("Death"))
+        {
+            IsOutOfScreen = true;
         }
     }
 
