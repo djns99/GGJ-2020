@@ -23,6 +23,11 @@ public class StartScreen : MonoBehaviour
         SceneManager.LoadScene(2);
     }
 
+    public void MainMenu()
+    {
+        SceneManager.LoadScene(1);
+    }
+    
     public void QuitGame()
     {
         Debug.Log("GetLost");
