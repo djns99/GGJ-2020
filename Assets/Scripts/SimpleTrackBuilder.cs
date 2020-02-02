@@ -50,6 +50,7 @@ public class SimpleTrackBuilder : MonoBehaviour
     private float trackAllowedRangeMax;
 
     public bool pointIsInTrack(Vector3 vec) {
+        vec.z = 0;
         foreach (var line in lines) {
             if (line.GetComponent<PolygonCollider2D>().bounds.Contains(vec))
                 return true;
