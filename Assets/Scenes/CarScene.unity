@@ -732,7 +732,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 300, y: 209}
+  m_AnchoredPosition: {x: 417, y: 287}
   m_SizeDelta: {x: 150, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &684081884
@@ -1707,7 +1707,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 147, y: 204}
+  m_AnchoredPosition: {x: 264, y: 282}
   m_SizeDelta: {x: 150, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1925620552
@@ -1915,6 +1915,8 @@ MonoBehaviour:
   jumpPitMidWidthSegments: 10
   pylonMaxHeight: 30
   pylonWidthSegments: 10
+  pylonPitMaxHeight: 30
+  pylonPitWidthPixels: 60
   numObstacles: 8
 --- !u!1 &2049732208
 GameObject:
