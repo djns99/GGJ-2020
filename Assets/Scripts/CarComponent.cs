@@ -27,11 +27,6 @@ public class CarComponent : MonoBehaviour
         {
             CollideWithGround = false;
         }
-
-        if (collision.gameObject.name.Contains("Death"))
-        {
-            IsOutOfScreen = true;
-        }
     }
 
     public void OnBecameInvisible()
