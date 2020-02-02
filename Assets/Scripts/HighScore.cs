@@ -20,7 +20,7 @@ public class HighScore : MonoBehaviour
 
             entryTemplate.gameObject.SetActive(false);
 
-            AddHighScoreEntry(10000, "Sid");
+            //AddHighScoreEntry(10000, "Sid");
 
             string jsonString = PlayerPrefs.GetString("highScoreTable");
             HighScores highScores = JsonUtility.FromJson<HighScores>(jsonString);
@@ -83,7 +83,10 @@ public class HighScore : MonoBehaviour
 
     public void SubmitEntryToJson()
     {
-        AddHighScoreEntry(GameManager.Instance.score, GameManager.Instance.name);
+        Debug.Log("I should be here");
+        Debug.Log(GameManager.Instance.score);
+        Debug.Log(GameManager.Instance.player_name);
+        AddHighScoreEntry(GameManager.Instance.score, name: GameManager.Instance.player_name);
     }
 
     private void AddHighScoreEntry(int score, string name)
