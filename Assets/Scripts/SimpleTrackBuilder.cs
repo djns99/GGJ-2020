@@ -41,10 +41,15 @@ public class SimpleTrackBuilder : MonoBehaviour
 
     public Material bridgeMaterial;
     public Material groundMaterial;
+    public Material cliffMaterial;
+    public Material spikeMaterial;
 
     public Material bridgeLineMaterial;
     public Material groundLineMaterial;
     public Material spikeLineMaterial;
+
+
+    public Material cliffLineMaterial;
 
     private int progress = 0;
     private int nextObstacleProgressMin;
@@ -101,6 +106,18 @@ public class SimpleTrackBuilder : MonoBehaviour
         
         var t = progress;
         return Mathf.Pow(1f - t, 3f) * p0 + 3f * Mathf.Pow(1f - t, 2f) * t * p1 + 3f * (1f - t) * Mathf.Pow(t, 2f) * p2 + Mathf.Pow(t, 3f) * p3;
+    }
+
+    void setCliffUVs() {
+        //var mesh = lines.Last.Value.GetComponent<MeshFilter>().mesh;
+        //var uvs = mesh.uv;
+        //Debug.Assert(uvs.Length == 4);
+        //uvs[0] = new Vector2(0f, 1f);
+        //uvs[1] = new Vector2(1f, 1f);
+        //uvs[2] = new Vector2(0f, 0f);
+        //uvs[3] = new Vector2(1f, 0f);
+        //Debug.Log(uvs.Length);
+        //Debug.Break();
     }
 
     void createNewLine(bool linkPrevious = true, Material material = null, Material lineMaterial = null) {
@@ -422,7 +439,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End left half
-        createNewLine(false, bridgeMaterial, bridgeLineMaterial);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         // Gap
         float targetWidth = gapWidthPixels;
@@ -442,7 +460,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         addPointToLinePos(pos);
 
         // End obstalce
-        createNewLine(true, bridgeMaterial, bridgeLineMaterial);
+        createNewLine(true, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         // Ease back into normal oepration
         bezeirCurveBackToPerlin(pos);
@@ -462,25 +481,19 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine(false);
-
-        var edge1 = pos;
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         // Cliff
         pos.y = Mathf.Min(trackAllowedRangeMax, pos.y + maxCliffHeightPixels);
         addPointToLinePos(pos);
-
-        var edge2 = pos;
-        // Make sure we dont kill someone on top
-        edge2.y -= 1f;
-        addDeathEdge(edge1, edge2);
 
         int numTrailOff = 10;
         pos.x += segmentWidth * numTrailOff;
         progress += numTrailOff;
         addPointToLinePos(pos);
 
-        createNewLine();
+        createNewLine(true, cliffMaterial, cliffLineMaterial);
 
         bezeirCurveBackToPerlin(pos);
     }
@@ -499,7 +512,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine(false);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         // Cliff
         pos.y = Mathf.Max(trackAllowedRangeMin, pos.y - maxCliffHeightPixels);
@@ -510,7 +524,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numTrailOff;
         addPointToLinePos(pos);
 
-        createNewLine();
+        createNewLine(true, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         bezeirCurveBackToPerlin(pos);
     }
@@ -552,7 +567,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine(false);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         var pylonBottom = pos;
 
@@ -568,7 +584,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += pylonWidthSegments;
         addPointToLinePos(pos);
 
-        createNewLine(false);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         // Flat leading away from pylon
         int numTrailOff = 10;
@@ -578,7 +595,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numTrailOff;
         addPointToLinePos(pos);
 
-        createNewLine();
+        createNewLine(true, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         bezeirCurveBackToPerlin(pos);
 
@@ -600,7 +618,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine(false);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         var pylonBottom = pos;
 
@@ -616,7 +635,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += pylonWidthSegments;
         addPointToLinePos(pos);
 
-        createNewLine(false);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         // Skip pit
         int pitWidthSgements = Mathf.CeilToInt(pylonPitWidthPixels / segmentWidth);
@@ -629,7 +649,9 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += pylonWidthSegments;
         addPointToLinePos(pos);
 
-        createNewLine(false);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
+
         // Flat leading away from pylon
         int numTrailOff = 10;
         pos.y = getNoise(progress + numTrailOff);
@@ -638,7 +660,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numTrailOff;
         addPointToLinePos(pos);
 
-        createNewLine();
+        createNewLine(true, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         bezeirCurveBackToPerlin(pos);
 
@@ -659,7 +682,8 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numLeadIn;
         addPointToLinePos(pos);
 
-        createNewLine(false);
+        createNewLine(false, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         // Pit start
         var originalY = pos.y;
@@ -692,7 +716,7 @@ public class SimpleTrackBuilder : MonoBehaviour
             progress++;
         }
 
-        createNewLine(false, groundMaterial, spikeLineMaterial);
+        createNewLine(false, spikeMaterial, spikeLineMaterial);
 
         // Cliff
         pos.y = originalY;
@@ -703,9 +727,12 @@ public class SimpleTrackBuilder : MonoBehaviour
         progress += numTrailOff;
         addPointToLinePos(pos);
 
-        createNewLine();
+        createNewLine(true, cliffMaterial, cliffLineMaterial);
+        setCliffUVs();
 
         bezeirCurveBackToPerlin(pos);
+
+        createNewLine();
     }
 
     void jumpPit() {
