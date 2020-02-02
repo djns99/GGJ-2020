@@ -50,7 +50,7 @@ public class LineDraw : MonoBehaviour
         if ( Input.GetMouseButton( 0 ) )
         {
             var finger_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if( Vector2.Distance( finger_pos, line_points[line_points.Count - 1 ]) > 4f)
+            if( Vector2.Distance( finger_pos, line_points[line_points.Count - 1 ]) > 2f)
             {
                 line_points.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 line_renderer.positionCount++;
@@ -61,21 +61,30 @@ public class LineDraw : MonoBehaviour
         {
             List<Vector2> edgePoints = new List<Vector2>();
             float halfWidth = line_renderer.startWidth / 2f;
-            line_renderer.Simplify(0.1f);
+            line_renderer.Simplify(0.5f);
 
             for (int i = 1; i < line_points.Count; i++)
             {
                 Vector2 distanceBetweenPoints = line_points[i - 1] - line_points[i];
                 Vector3 crossProduct = Vector3.Cross(distanceBetweenPoints, Vector3.forward);
 
-                int num_smoved = 20;
-                float reduce = i < num_smoved ? -halfWidth + (line_renderer.startWidth / num_smoved) * i : halfWidth; 
+                int num_smoved = 5;
+                float reduce = i - 1 < num_smoved ? -halfWidth + (halfWidth / num_smoved) * (i - 1) : 0; 
 
                 Vector2 up = (reduce) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
                 Vector2 down = -(halfWidth) * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[i - 1];
 
                 edgePoints.Insert(0, down);
                 edgePoints.Add(up);
+
+                if (i == line_points.Count - 1)
+                {
+                    up = line_points[ i ];
+                    down = -halfWidth * new Vector2(crossProduct.normalized.x, crossProduct.normalized.y) + line_points[ i ];
+                    edgePoints.Insert(0, down);
+                    edgePoints.Add(up);
+                }
+
             }
 
             poly_collider.SetPath(0, edgePoints.ToArray());

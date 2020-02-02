@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -31,10 +32,10 @@ public class GameManager : MonoBehaviour
 
     public void AssignPlayer()
     {
-        GameObject inputField = GameObject.Find("InputField");
+        GameObject inputField = GameObject.Find("Text Area");
         if ( inputField != null)
         {
-            player_name = inputField.transform.Find("Text").GetComponent<Text>().text;
+            player_name = inputField.transform.Find("Text").GetComponent<TextMeshProUGUI>().text;
         }
         if (player_name == "") player_name = "Player1";
     }
