@@ -10,6 +10,7 @@ public class LineDraw : MonoBehaviour
     public PolygonCollider2D poly_collider;
     public List<Vector2> line_points;
     public SimpleTrackBuilder builder;
+    public Camera cam;
 
 
     // Update is called once per frame
@@ -19,7 +20,16 @@ public class LineDraw : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) )
         {
+            if (current_line != null) {
+                var oldLineScript = current_line.GetComponent<Line>();
+                oldLineScript.building = false;
+            }
+
             current_line = Instantiate(line, Vector3.zero, Quaternion.identity);
+            var lineScript = current_line.GetComponent<Line>();
+            lineScript.cam = cam;
+            lineScript.position = mouse_pos;
+            lineScript.building = true;
             var rig = current_line.GetComponent<Rigidbody2D>();
             rig.isKinematic = true;
 
