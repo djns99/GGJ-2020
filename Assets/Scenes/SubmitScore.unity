@@ -683,6 +683,7 @@ GameObject:
   m_Component:
   - component: {fileID: 621689208}
   - component: {fileID: 621689209}
+  - component: {fileID: 621689210}
   m_Layer: 0
   m_Name: userProfile
   m_TagString: Untagged
@@ -715,6 +716,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b48315080450e814ea7b30e1ac7ea87b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &621689210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 621689207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bac82e6c3ef247438a098ed5fb6aebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &633706325
@@ -1673,6 +1686,17 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 621689209}
         m_MethodName: PlayGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+      - m_Target: {fileID: 621689210}
+        m_MethodName: SubmitEntryToJson
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
