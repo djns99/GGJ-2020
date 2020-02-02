@@ -769,9 +769,17 @@ public class SimpleTrackBuilder : MonoBehaviour
         createNewLine();
     }
 
+    private int num_obs = 0;
+    private int num_actual_obs = 0;
     void addObstacle()
     {
-        int objectId = Random.Range(0, numObstacles);
+        num_obs++;
+        if( num_obs % 1 == 0 && num_actual_obs < numObstacles )
+        {
+            num_actual_obs++;
+        }
+        Debug.Log("num_actual_obs: " + num_actual_obs);
+        int objectId = Random.Range(0, num_actual_obs);
         switch (objectId)
         {
             case 0:
