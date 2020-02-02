@@ -1988,6 +1988,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackElement: {fileID: 3082366957389883285, guid: 51b1ac5f5e5b0964bac7b23969e86bf2,
     type: 3}
+  deathCollider: {fileID: 4548253074112282695, guid: 2ac1c5188a4055944871cde0a6640ec4,
+    type: 3}
   segmentWidth: 1
   minSegmentsBetweenObstacle: 0
   maxSegmentsBetweenObstacle: 15
