@@ -16,7 +16,7 @@ public class CarController : MonoBehaviour
     private List<Transform> carPieces;
     private List<Vector3> compDirections;
 
-    private float originalSpeed = -2500f;
+    private float originalSpeed = -2000f;
 
     public float carStoppingCounter;
 

@@ -10,27 +10,29 @@ public class LineDraw : MonoBehaviour
     public PolygonCollider2D poly_collider;
     public List<Vector2> line_points;
     public SimpleTrackBuilder builder;
+    bool inside = false;
 
     // Update is called once per frame
     void Update()
     {
         var mouse_pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        if ( Input.GetMouseButtonDown( 0 ) )
+        if (Input.GetMouseButtonDown(0) || (inside && Input.GetMouseButton(0)) )
         {
+            if (builder.pointIsInTrack(mouse_pos))
+            {
+                Debug.Log("INSIDE GROUND Clicks");
+                inside = true;
+                return;
+            }
+
+            inside = false;
             current_line = Instantiate(line, Vector3.zero, Quaternion.identity);
             var rig = current_line.GetComponent<Rigidbody2D>();
             rig.isKinematic = true;
 
             line_renderer = current_line.GetComponent<LineRenderer>();
             poly_collider = current_line.GetComponent<PolygonCollider2D>();
-
-
-            if (builder.pointIsInTrack(mouse_pos))
-            {
-                Debug.Log("INSIDE GROUND Clicks");
-                return;
-            }
 
             line_points.Clear();
             line_points.Add(mouse_pos);
@@ -47,7 +49,7 @@ public class LineDraw : MonoBehaviour
             {
                 if (builder.pointIsInTrack(mouse_pos))
                 {
-                    Debug.Log("INSIDE GROUND hold")
+                    Debug.Log("INSIDE GROUND hold");
                     return;
                 }
 
